@@ -1,0 +1,9 @@
+app:
+  name: 'shuryak-blog-articles-service'
+  version: '1.0.0'
+
+http:
+  port: '8080'
+
+postgres:
+  pool_max: 2
