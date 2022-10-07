@@ -31,7 +31,7 @@ func (r *articlesRoutes) getAll(c *gin.Context) {
 	articles, err := r.a.GetMany(c.Request.Context())
 	if err != nil {
 		// TODO: do log
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems: "+err.Error())
 
 		return
 	}
@@ -41,17 +41,19 @@ func (r *articlesRoutes) getAll(c *gin.Context) {
 
 // TODO: make example attr
 type createArticleRequest struct {
-	CustomId string                 `json:"custom_id" binding:"required"`
-	AuthorId int                    `json:"author_id" binding:"required"`
-	Title    string                 `json:"title" binding:"required"`
-	Content  map[string]interface{} `json:"content" binding:"required"`
+	CustomId  string                 `json:"custom_id" binding:"min=3,max=20,required"`
+	AuthorId  int                    `json:"author_id" binding:"required"`
+	Title     string                 `json:"title" binding:"min=5,max=150,required"`
+	Thumbnail string                 `json:"thumbnail" binding:"url,required"`
+	Content   map[string]interface{} `json:"content" binding:"required"`
 }
 
 func (r *articlesRoutes) create(c *gin.Context) {
 	var request createArticleRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		// TODO: do log
-		errorResponse(c, http.StatusBadRequest, "invalid request body")
+		errorResponse(c, http.StatusBadRequest, "invalid request body: "+err.Error())
+		return
 	}
 
 	article, err := r.a.Create(c.Request.Context(), entity.Article{

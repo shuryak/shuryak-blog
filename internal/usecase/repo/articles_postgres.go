@@ -37,7 +37,7 @@ func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) error {
 
 func (r *ArticlesRepo) GetMany(ctx context.Context) ([]entity.Article, error) {
 	sql, _, err := r.Builder.
-		Select("*").
+		Select("id, custom_id, author_id, title, thumbnail, content, created_at").
 		From("articles").
 		ToSql()
 	if err != nil {
@@ -55,7 +55,7 @@ func (r *ArticlesRepo) GetMany(ctx context.Context) ([]entity.Article, error) {
 	for rows.Next() {
 		e := entity.Article{}
 
-		err = rows.Scan(&e.Id, &e.CustomId, &e.AuthorId, &e.Title, &e.Content)
+		err = rows.Scan(&e.Id, &e.CustomId, &e.AuthorId, &e.Title, &e.Thumbnail, &e.Content, &e.CreatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("ArticlesRepo - GetMany - rows.Scan: %w", err)
 		}
