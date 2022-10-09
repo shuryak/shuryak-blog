@@ -52,7 +52,8 @@ func (r *articlesRoutes) create(c *gin.Context) {
 	var request createArticleRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		// TODO: do log
-		errorResponse(c, http.StatusBadRequest, "invalid request body: "+err.Error())
+		//errorResponse(c, http.StatusBadRequest, "invalid request body: "+err.Error())
+		validationErrorResponse(c, http.StatusBadRequest, err)
 		return
 	}
 

@@ -7,6 +7,7 @@ import (
 
 func NewRouter(handler *gin.Engine, a usecase.Article) {
 	// TODO: more options
+
 	// Routers
 	h := handler.Group("/v1")
 	{
