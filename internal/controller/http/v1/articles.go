@@ -27,6 +27,12 @@ type articlesResponse struct {
 	Articles []entity.Article `json:"articles"`
 }
 
+// @Summary Gets all articles
+// @Description Gets all articles
+// @Produce json
+// @Success 200 {object} articlesResponse
+// @Failure 500 {object} response
+// @Router /articles/getAll [get]
 func (r *articlesRoutes) getAll(c *gin.Context) {
 	articles, err := r.a.GetMany(c.Request.Context())
 	if err != nil {
@@ -48,6 +54,15 @@ type createArticleRequest struct {
 	Content   map[string]interface{} `json:"content" binding:"required"`
 }
 
+// TODO: change return
+// @Summary Creates an article
+// @Description Creates an article
+// @Accept json
+// @Produce json
+// @Success 200 {object} entity.Article
+// @Failure 400 {object} response
+// @Failure 500 {object} response
+// @Router /articles/create [post]
 func (r *articlesRoutes) create(c *gin.Context) {
 	var request createArticleRequest
 	if err := c.ShouldBindJSON(&request); err != nil {

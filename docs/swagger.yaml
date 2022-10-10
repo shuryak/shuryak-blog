@@ -1,0 +1,75 @@
+basePath: /v1
+definitions:
+  entity.Article:
+    properties:
+      author_id:
+        type: integer
+      content:
+        additionalProperties: true
+        type: object
+      created_at:
+        type: string
+      custom_id:
+        type: string
+      id:
+        type: integer
+      thumbnail:
+        type: string
+      title:
+        type: string
+    type: object
+  v1.articlesResponse:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/entity.Article'
+        type: array
+    type: object
+  v1.response:
+    properties:
+      error: {}
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Service for managing articles
+  title: Articles API
+  version: 1.0.0
+paths:
+  /articles/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates an article
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Article'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Creates an article
+  /articles/getAll:
+    get:
+      description: Gets all articles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.articlesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Gets all articles
+swagger: "2.0"
