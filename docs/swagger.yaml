@@ -1,29 +1,63 @@
 basePath: /v1
 definitions:
-  entity.Article:
+  v1.articleResponse:
     properties:
       author_id:
+        example: 42
         type: integer
       content:
         additionalProperties: true
         type: object
       created_at:
+        example: "2022-10-07T14:26:06.510465Z"
         type: string
       custom_id:
+        example: article-url
         type: string
       id:
+        example: 1000
         type: integer
       thumbnail:
+        example: https://smth.com/thumbnail.png
         type: string
       title:
+        example: How to ...
         type: string
     type: object
   v1.articlesResponse:
     properties:
       articles:
         items:
-          $ref: '#/definitions/entity.Article'
+          $ref: '#/definitions/v1.articleResponse'
         type: array
+    type: object
+  v1.createArticleRequest:
+    properties:
+      author_id:
+        example: 42
+        type: integer
+      content:
+        additionalProperties: true
+        type: object
+      custom_id:
+        example: article-url
+        maxLength: 20
+        minLength: 3
+        type: string
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        maxLength: 150
+        minLength: 5
+        type: string
+    required:
+    - author_id
+    - content
+    - custom_id
+    - thumbnail
+    - title
     type: object
   v1.response:
     properties:
@@ -41,13 +75,20 @@ paths:
       consumes:
       - application/json
       description: Creates an article
+      parameters:
+      - description: article to create
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.createArticleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Article'
+            $ref: '#/definitions/v1.articlesResponse'
         "400":
           description: Bad Request
           schema:

@@ -4,7 +4,7 @@ PG_URL := postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${DB}?
 export PG_URL
 
 debug:
-	docker-compose up -d postgres db-migrations && go run cmd/app/main.go
+	swag init -g internal/controller/http/v1/router.go && docker-compose up -d postgres db-migrations && go run cmd/app/main.go
 .PHONY: debug
 
 swagger:
