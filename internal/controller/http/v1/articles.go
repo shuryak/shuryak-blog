@@ -97,10 +97,11 @@ func (r *articlesRoutes) create(c *gin.Context) {
 	}
 
 	article, err := r.a.Create(c.Request.Context(), entity.Article{
-		CustomId: request.CustomId,
-		AuthorId: request.AuthorId,
-		Title:    request.Title,
-		Content:  request.Content,
+		CustomId:  request.CustomId,
+		AuthorId:  request.AuthorId,
+		Title:     request.Title,
+		Thumbnail: request.Thumbnail,
+		Content:   request.Content,
 	})
 	if err != nil {
 		// TODO: do log and delete next line
