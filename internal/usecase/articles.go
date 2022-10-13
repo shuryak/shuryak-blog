@@ -14,12 +14,18 @@ func New(r ArticlesRepo) *ArticlesUseCase {
 	return &ArticlesUseCase{r}
 }
 
-func (uc *ArticlesUseCase) Create(ctx context.Context, a entity.Article) (entity.Article, error) {
-	if err := uc.repo.Create(context.Background(), a); err != nil {
-		return entity.Article{}, fmt.Errorf("ArticlesUseCase - Create - s.repo.Store: %w", err)
+func (uc *ArticlesUseCase) Create(ctx context.Context, a entity.Article) (*entity.Article, error) {
+	id, err := uc.repo.Create(context.Background(), a)
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.Store: %w", err)
 	}
 
-	return a, nil
+	articleEntity, err := uc.repo.GetById(context.Background(), id)
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.GetById: %w", err)
+	}
+
+	return articleEntity, nil
 }
 
 func (uc *ArticlesUseCase) GetMany(ctx context.Context) ([]entity.Article, error) {
