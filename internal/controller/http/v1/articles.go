@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"shuryak-blog/internal/entity"
 	"shuryak-blog/internal/usecase"
+	"shuryak-blog/pkg/logger"
 	"time"
 )
 
@@ -14,7 +15,7 @@ type articlesRoutes struct {
 	// TODO: logger
 }
 
-func newArticlesRoutes(handler *gin.RouterGroup, a usecase.Article) {
+func newArticlesRoutes(handler *gin.RouterGroup, a usecase.Article, l logger.Interface) {
 	r := &articlesRoutes{a}
 
 	h := handler.Group("/articles")

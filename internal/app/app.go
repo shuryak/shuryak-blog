@@ -13,13 +13,15 @@ import (
 	"shuryak-blog/internal/usecase"
 	"shuryak-blog/internal/usecase/repo"
 	"shuryak-blog/pkg/httpserver"
+	"shuryak-blog/pkg/logger"
 	"shuryak-blog/pkg/postgres"
 	"strings"
 	"syscall"
 )
 
 func Run(cfg *config.Config) {
-	// TODO: logger init
+	// Logger
+	l := logger.New(cfg.Log.Level)
 
 	// Repository
 	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
@@ -45,7 +47,7 @@ func Run(cfg *config.Config) {
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, articlesUseCase)
+	v1.NewRouter(handler, l, articlesUseCase)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal
