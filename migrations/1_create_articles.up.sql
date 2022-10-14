@@ -4,4 +4,4 @@ CREATE TABLE IF NOT EXISTS articles (
     author_id BIGINT NOT NULL,
     title TEXT NOT NULL,
     content JSON NOT NULL
-)
+);

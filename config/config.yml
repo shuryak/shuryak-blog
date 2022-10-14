@@ -5,5 +5,8 @@ app:
 http:
   port: '8080'
 
+logger:
+  log_level: 'debug'
+
 postgres:
   pool_max: 2

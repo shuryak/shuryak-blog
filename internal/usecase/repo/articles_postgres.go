@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"shuryak-blog/internal/entity"
 	"shuryak-blog/pkg/postgres"
 )
@@ -17,27 +18,50 @@ func New(pg *postgres.Postgres) *ArticlesRepo {
 	return &ArticlesRepo{pg}
 }
 
-func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) error {
+func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int64, error) {
 	sql, args, err := r.Builder.
 		Insert("articles").
-		Columns("custom_id, author_id, title, content").
-		Values(a.CustomId, a.AuthorId, a.Title, a.Content).
+		Columns("custom_id, author_id, title, thumbnail, content").
+		Values(a.CustomId, a.AuthorId, a.Title, a.Thumbnail, a.Content).
+		Suffix("RETURNING \"id\"").
 		ToSql()
 	if err != nil {
-		return fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
+		return 0, fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
 	}
 
-	_, err = r.Pool.Exec(ctx, sql, args...)
+	var id int64
+	row := r.Pool.QueryRow(ctx, sql, args...)
+	if err = row.Scan(&id); err != nil {
+		return 0, fmt.Errorf("ArticlesRepo - Create - row.Scan: %w", err)
+	}
+
+	return id, nil
+}
+
+func (r *ArticlesRepo) GetById(ctx context.Context, id int64) (*entity.Article, error) {
+	sql, args, err := r.Builder.
+		Select("id, custom_id, author_id, title, content, thumbnail, created_at").
+		From("articles").
+		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
 	if err != nil {
-		return fmt.Errorf("ArticlesRepo - Create - r.Pool.Exec: %w", err)
+		return nil, fmt.Errorf("ArticlesRepo - GetById - r.Builder: %w", err)
 	}
 
-	return nil
+	row := r.Pool.QueryRow(ctx, sql, args...)
+	a := entity.Article{}
+	err = row.Scan(&a.Id, &a.CustomId, &a.AuthorId, &a.Title, &a.Content, &a.Thumbnail, &a.CreatedAt)
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesRepo - GetById - row.Scan: %w", err)
+	}
+
+	return &a, nil
 }
 
 func (r *ArticlesRepo) GetMany(ctx context.Context) ([]entity.Article, error) {
 	sql, _, err := r.Builder.
-		Select("*").
+		Select("id, custom_id, author_id, title, thumbnail, content, created_at").
 		From("articles").
 		ToSql()
 	if err != nil {
@@ -55,7 +79,7 @@ func (r *ArticlesRepo) GetMany(ctx context.Context) ([]entity.Article, error) {
 	for rows.Next() {
 		e := entity.Article{}
 
-		err = rows.Scan(&e.Id, &e.CustomId, &e.AuthorId, &e.Title, &e.Content)
+		err = rows.Scan(&e.Id, &e.CustomId, &e.AuthorId, &e.Title, &e.Thumbnail, &e.Content, &e.CreatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("ArticlesRepo - GetMany - rows.Scan: %w", err)
 		}

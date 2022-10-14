@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -51,7 +52,7 @@ func New(url string, opts ...Option) (*Postgres, error) {
 			break
 		}
 
-		// TODO: make log
+		log.Printf("Postgres is trying to connect, attempts left: %d", pg.connAttempts)
 
 		time.Sleep(pg.connTimeout)
 

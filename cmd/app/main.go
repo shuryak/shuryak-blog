@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"shuryak-blog/config"
 	"shuryak-blog/internal/app"
 )
@@ -8,7 +9,7 @@ import (
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		// TODO: LOG
+		log.Fatalf("Config error: %s", err)
 	}
 
 	// Run
