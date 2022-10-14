@@ -9,6 +9,7 @@ type (
 	Config struct {
 		App  `yaml:"app"`
 		HTTP `yaml:"http"`
+		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`
 	}
 
@@ -19,6 +20,10 @@ type (
 
 	HTTP struct {
 		Port string `yaml:"port" env:"HTTP_PORT"`
+	}
+
+	Log struct {
+		Level string `env-required:"true" yaml:"log_level" env:"LOG_LEVEL"`
 	}
 
 	PG struct {
