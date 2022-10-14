@@ -26,7 +26,7 @@ func Run(cfg *config.Config) {
 	// Repository
 	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
 	if err != nil {
-		// TODO: log postgres err
+		l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
 	}
 	defer pg.Close()
 
@@ -56,15 +56,14 @@ func Run(cfg *config.Config) {
 
 	select {
 	case s := <-interrupt:
-		fmt.Println("App is running: " + s.String())
-	// TODO: LOG: app is running...
+		l.Info("app - Run - signal: " + s.String())
 	case err = <-httpServer.Notify():
-		// TODO: LOG ERROR
+		l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
 	}
 
 	// Shutdown
 	err = httpServer.Shutdown()
 	if err != nil {
-		// TODO: LOG ?
+		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
 	}
 }
