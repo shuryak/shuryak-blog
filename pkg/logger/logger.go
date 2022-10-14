@@ -70,8 +70,9 @@ func (l *Logger) Error(message interface{}, args ...interface{}) {
 }
 
 func (l *Logger) Fatal(message interface{}, args ...interface{}) {
-	//TODO implement me
-	panic("implement me")
+	l.msg("fatal", message, args...)
+
+	os.Exit(1)
 }
 
 func (l *Logger) log(message string, args ...interface{}) {
