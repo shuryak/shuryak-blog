@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"shuryak-blog/internal/entity"
@@ -12,11 +11,11 @@ import (
 
 type articlesRoutes struct {
 	a usecase.Article
-	// TODO: logger
+	l logger.Interface
 }
 
 func newArticlesRoutes(handler *gin.RouterGroup, a usecase.Article, l logger.Interface) {
-	r := &articlesRoutes{a}
+	r := &articlesRoutes{a, l}
 
 	h := handler.Group("/articles")
 	{
@@ -38,8 +37,8 @@ type articlesResponse struct {
 func (r *articlesRoutes) getAll(c *gin.Context) {
 	articles, err := r.a.GetMany(c.Request.Context())
 	if err != nil {
-		// TODO: do log
-		errorResponse(c, http.StatusInternalServerError, "database problems: "+err.Error())
+		r.l.Error(err, "http - v1 - getAll")
+		errorResponse(c, http.StatusInternalServerError, "database problems")
 
 		return
 	}
@@ -60,7 +59,6 @@ func (r *articlesRoutes) getAll(c *gin.Context) {
 	c.JSON(http.StatusOK, articlesResponse{ar})
 }
 
-// TODO: make example attr
 type createArticleRequest struct {
 	CustomId  string                 `json:"custom_id" binding:"min=3,max=20,required" example:"article-url"`
 	AuthorId  int                    `json:"author_id" binding:"required" example:"42"`
@@ -91,9 +89,8 @@ type articleResponse struct {
 func (r *articlesRoutes) create(c *gin.Context) {
 	var request createArticleRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		// TODO: do log
-		//errorResponse(c, http.StatusBadRequest, "invalid request body: "+err.Error())
-		validationErrorResponse(c, http.StatusBadRequest, err)
+		r.l.Error(err, "http - v1 - create")
+		validationErrorResponse(c, http.StatusBadRequest, err) // TODO: make good error structs
 		return
 	}
 
@@ -105,8 +102,7 @@ func (r *articlesRoutes) create(c *gin.Context) {
 		Content:   request.Content,
 	})
 	if err != nil {
-		// TODO: do log and delete next line
-		fmt.Println("problems: ", err.Error())
+		r.l.Error(err, "http - v1 - create")
 		errorResponse(c, http.StatusInternalServerError, "database problems")
 
 		return
