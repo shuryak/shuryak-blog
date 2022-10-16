@@ -22,7 +22,7 @@ func New(pg *postgres.Postgres) *ArticlesRepo {
 	return &ArticlesRepo{pg}
 }
 
-func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int, error) {
+func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (uint, error) {
 	sql, args, err := r.Builder.
 		Insert("articles").
 		Columns("custom_id, author_id, title, thumbnail, content").
@@ -33,7 +33,7 @@ func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int, error
 		return 0, fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
 	}
 
-	var id int
+	var id uint
 	row := r.Pool.QueryRow(ctx, sql, args...)
 	if err = row.Scan(&id); err != nil {
 		return 0, fmt.Errorf("ArticlesRepo - Create - row.Scan: %w", err)
@@ -42,7 +42,7 @@ func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int, error
 	return id, nil
 }
 
-func (r *ArticlesRepo) GetById(ctx context.Context, id int) (*entity.Article, error) {
+func (r *ArticlesRepo) GetById(ctx context.Context, id uint) (*entity.Article, error) {
 	sql, args, err := r.Builder.
 		Select("id, custom_id, author_id, title, content, thumbnail, created_at").
 		From("articles").
@@ -123,7 +123,7 @@ func (r *ArticlesRepo) Update(ctx context.Context, a entity.Article) (*entity.Ar
 	return &newArticle, nil
 }
 
-func (r *ArticlesRepo) Delete(ctx context.Context, id int) (*entity.Article, error) {
+func (r *ArticlesRepo) Delete(ctx context.Context, id uint) (*entity.Article, error) {
 	sql, args, err := r.Builder.
 		Delete("articles").
 		Where(squirrel.Eq{"id": id}).

@@ -13,10 +13,10 @@ type (
 	}
 
 	ArticlesRepo interface {
-		Create(ctx context.Context, a entity.Article) (int, error)
-		GetById(ctx context.Context, id int) (*entity.Article, error)
+		Create(ctx context.Context, a entity.Article) (uint, error)
+		GetById(ctx context.Context, id uint) (*entity.Article, error)
 		GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error)
 		Update(ctx context.Context, a entity.Article) (*entity.Article, error)
-		Delete(ctx context.Context, id int) (*entity.Article, error)
+		Delete(ctx context.Context, id uint) (*entity.Article, error)
 	}
 )
