@@ -63,10 +63,12 @@ func (r *ArticlesRepo) GetById(ctx context.Context, id int) (*entity.Article, er
 	return &a, nil
 }
 
-func (r *ArticlesRepo) GetMany(ctx context.Context) ([]entity.Article, error) {
+func (r *ArticlesRepo) GetMany(ctx context.Context, offset int, count uint) ([]entity.Article, error) {
 	sql, _, err := r.Builder.
 		Select("id, custom_id, author_id, title, thumbnail, content, created_at").
 		From("articles").
+		Where(squirrel.GtOrEq{"id": offset}).
+		Limit(uint64(count)).
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesRepo - GetMany - r.Builder: %w", err)
