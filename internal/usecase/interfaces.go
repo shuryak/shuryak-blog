@@ -13,8 +13,9 @@ type (
 	}
 
 	ArticlesRepo interface {
-		Create(ctx context.Context, a entity.Article) (int64, error)
-		GetById(ctx context.Context, id int64) (*entity.Article, error)
+		Create(ctx context.Context, a entity.Article) (int, error)
+		GetById(ctx context.Context, id int) (*entity.Article, error)
 		GetMany(ctx context.Context) ([]entity.Article, error)
+		Delete(ctx context.Context, id int) (*entity.Article, error)
 	}
 )

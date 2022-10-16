@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"shuryak-blog/internal/entity"
+	"shuryak-blog/internal/usecase"
 	"shuryak-blog/pkg/postgres"
 )
 
@@ -14,11 +15,14 @@ type ArticlesRepo struct {
 	*postgres.Postgres
 }
 
+// Check for implementation
+var _ usecase.ArticlesRepo = (*ArticlesRepo)(nil)
+
 func New(pg *postgres.Postgres) *ArticlesRepo {
 	return &ArticlesRepo{pg}
 }
 
-func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int64, error) {
+func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int, error) {
 	sql, args, err := r.Builder.
 		Insert("articles").
 		Columns("custom_id, author_id, title, thumbnail, content").
@@ -29,7 +33,7 @@ func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int64, err
 		return 0, fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
 	}
 
-	var id int64
+	var id int
 	row := r.Pool.QueryRow(ctx, sql, args...)
 	if err = row.Scan(&id); err != nil {
 		return 0, fmt.Errorf("ArticlesRepo - Create - row.Scan: %w", err)
@@ -38,7 +42,7 @@ func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (int64, err
 	return id, nil
 }
 
-func (r *ArticlesRepo) GetById(ctx context.Context, id int64) (*entity.Article, error) {
+func (r *ArticlesRepo) GetById(ctx context.Context, id int) (*entity.Article, error) {
 	sql, args, err := r.Builder.
 		Select("id, custom_id, author_id, title, content, thumbnail, created_at").
 		From("articles").
@@ -88,4 +92,23 @@ func (r *ArticlesRepo) GetMany(ctx context.Context) ([]entity.Article, error) {
 	}
 
 	return entities, nil
+}
+
+func (r *ArticlesRepo) Delete(ctx context.Context, id int) (*entity.Article, error) {
+	sql, args, err := r.Builder.
+		Delete("articles").
+		Where(squirrel.Eq{"id": id}).
+		Suffix("RETURNING *").
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesRepo - Delete - r.Builder: %w", err)
+	}
+
+	row := r.Pool.QueryRow(ctx, sql, args...)
+	a := entity.Article{}
+	if err = row.Scan(&a.Id, &a.CustomId, &a.AuthorId, &a.Title, &a.Thumbnail, &a.Content, &a.CreatedAt); err != nil {
+		return nil, fmt.Errorf("ArticlesRepo - Delete - row.Scan: %w", err)
+	}
+
+	return &a, nil
 }
