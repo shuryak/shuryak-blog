@@ -96,6 +96,33 @@ func (r *ArticlesRepo) GetMany(ctx context.Context, offset int, count uint) ([]e
 	return entities, nil
 }
 
+func (r *ArticlesRepo) Update(ctx context.Context, a entity.Article) (*entity.Article, error) {
+	clauses := make(map[string]interface{})
+	clauses["custom_id"] = a.CustomId
+	clauses["title"] = a.Title
+	clauses["thumbnail"] = a.Thumbnail
+	clauses["content"] = a.Content
+	// TODO: updated_at
+
+	sql, args, err := r.Builder.
+		Update("articles").
+		SetMap(clauses).
+		Suffix("RETURNING *").
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesRepo - Update - r.Builder: %w", err)
+	}
+
+	row := r.Pool.QueryRow(ctx, sql, args...)
+	newArticle := entity.Article{}
+	if err = row.Scan(&newArticle.Id, &newArticle.CustomId, &newArticle.AuthorId, &newArticle.Title,
+		&newArticle.Thumbnail, &newArticle.Content, &newArticle.CreatedAt); err != nil {
+		return nil, fmt.Errorf("ArticlesRepo - Update - row.Scan: %w", err)
+	}
+
+	return &newArticle, nil
+}
+
 func (r *ArticlesRepo) Delete(ctx context.Context, id int) (*entity.Article, error) {
 	sql, args, err := r.Builder.
 		Delete("articles").
