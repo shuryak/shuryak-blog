@@ -10,6 +10,9 @@ type ArticlesUseCase struct {
 	repo ArticlesRepo
 }
 
+// Check for implementation
+var _ Article = (*ArticlesUseCase)(nil)
+
 func New(r ArticlesRepo) *ArticlesUseCase {
 	return &ArticlesUseCase{r}
 }
@@ -28,8 +31,8 @@ func (uc *ArticlesUseCase) Create(ctx context.Context, a entity.Article) (*entit
 	return articleEntity, nil
 }
 
-func (uc *ArticlesUseCase) GetMany(ctx context.Context) ([]entity.Article, error) {
-	articles, err := uc.repo.GetMany(ctx)
+func (uc *ArticlesUseCase) GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error) {
+	articles, err := uc.repo.GetMany(ctx, offset, count)
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesUseCase - GetMany - s.repo.GetMany: %w", err)
 	}

@@ -9,7 +9,7 @@ type (
 	// Article - .
 	Article interface {
 		Create(ctx context.Context, a entity.Article) (*entity.Article, error)
-		GetMany(ctx context.Context) ([]entity.Article, error)
+		GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error)
 	}
 
 	ArticlesRepo interface {
