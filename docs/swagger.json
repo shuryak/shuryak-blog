@@ -52,13 +52,32 @@
                 }
             }
         },
-        "/articles/getAll": {
+        "/articles/getMany": {
             "get": {
                 "description": "Gets all articles",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "summary": "Gets all articles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "offset to get",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "count to get",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

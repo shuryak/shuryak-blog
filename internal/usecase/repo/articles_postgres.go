@@ -64,7 +64,7 @@ func (r *ArticlesRepo) GetById(ctx context.Context, id uint) (*entity.Article, e
 }
 
 func (r *ArticlesRepo) GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error) {
-	sql, _, err := r.Builder.
+	sql, args, err := r.Builder.
 		Select("id, custom_id, author_id, title, thumbnail, content, created_at").
 		From("articles").
 		Where(squirrel.GtOrEq{"id": offset}).
@@ -74,13 +74,13 @@ func (r *ArticlesRepo) GetMany(ctx context.Context, offset uint, count uint) ([]
 		return nil, fmt.Errorf("ArticlesRepo - GetMany - r.Builder: %w", err)
 	}
 
-	rows, err := r.Pool.Query(ctx, sql)
+	rows, err := r.Pool.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesRepo - GetMany - r.Pool.Query: %w", err)
 	}
 	defer rows.Close()
 
-	entities := make([]entity.Article, 0, _defaultEntityCap)
+	entities := make([]entity.Article, 0, count)
 
 	for rows.Next() {
 		e := entity.Article{}

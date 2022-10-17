@@ -98,9 +98,22 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Creates an article
-  /articles/getAll:
+  /articles/getMany:
     get:
+      consumes:
+      - application/json
       description: Gets all articles
+      parameters:
+      - description: offset to get
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: count to get
+        in: query
+        name: count
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
