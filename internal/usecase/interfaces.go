@@ -9,12 +9,17 @@ type (
 	// Article - .
 	Article interface {
 		Create(ctx context.Context, a entity.Article) (*entity.Article, error)
-		GetMany(ctx context.Context) ([]entity.Article, error)
+		GetById(ctx context.Context, id uint) (*entity.Article, error)
+		GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error)
+		Update(ctx context.Context, a entity.Article) (*entity.Article, error)
+		Delete(ctx context.Context, id uint) (*entity.Article, error)
 	}
 
 	ArticlesRepo interface {
-		Create(ctx context.Context, a entity.Article) (int64, error)
-		GetById(ctx context.Context, id int64) (*entity.Article, error)
-		GetMany(ctx context.Context) ([]entity.Article, error)
+		Create(ctx context.Context, a entity.Article) (*entity.Article, error)
+		GetById(ctx context.Context, id uint) (*entity.Article, error)
+		GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error)
+		Update(ctx context.Context, a entity.Article) (*entity.Article, error)
+		Delete(ctx context.Context, id uint) (*entity.Article, error)
 	}
 )

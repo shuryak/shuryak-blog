@@ -13,11 +13,11 @@ import (
 
 // NewRouter - .
 // Swagger spec:
-// @title Articles API
+// @title       Articles API
 // @description Service for managing articles
-// @version 1.0.0
-// @host localhost:8080
-// @BasePath /v1
+// @version     1.0.0
+// @host        localhost:8080
+// @BasePath    /v1
 func NewRouter(handler *gin.Engine, l logger.Interface, a usecase.Article) {
 	// TODO: more options
 	handler.Use(gin.Logger())
