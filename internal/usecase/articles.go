@@ -10,29 +10,56 @@ type ArticlesUseCase struct {
 	repo ArticlesRepo
 }
 
+// Check for implementation
+var _ Article = (*ArticlesUseCase)(nil)
+
 func New(r ArticlesRepo) *ArticlesUseCase {
 	return &ArticlesUseCase{r}
 }
 
-func (uc *ArticlesUseCase) Create(ctx context.Context, a entity.Article) (*entity.Article, error) {
-	id, err := uc.repo.Create(context.Background(), a)
-	if err != nil {
-		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.Store: %w", err)
-	}
+// TODO: deal with the context
 
-	articleEntity, err := uc.repo.GetById(context.Background(), id)
+func (uc *ArticlesUseCase) Create(ctx context.Context, a entity.Article) (*entity.Article, error) {
+	articleEntity, err := uc.repo.Create(context.Background(), a)
 	if err != nil {
-		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.GetById: %w", err)
+		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.Create: %w", err)
 	}
 
 	return articleEntity, nil
 }
 
-func (uc *ArticlesUseCase) GetMany(ctx context.Context) ([]entity.Article, error) {
-	articles, err := uc.repo.GetMany(ctx)
+func (uc *ArticlesUseCase) GetById(ctx context.Context, id uint) (*entity.Article, error) {
+	a, err := uc.repo.GetById(context.Background(), id)
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesUseCase - GetById - s.repo.GetById")
+	}
+
+	return a, nil
+}
+
+func (uc *ArticlesUseCase) GetMany(ctx context.Context, offset uint, count uint) ([]entity.Article, error) {
+	a, err := uc.repo.GetMany(context.Background(), offset, count)
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesUseCase - GetMany - s.repo.GetMany: %w", err)
 	}
 
-	return articles, nil
+	return a, nil
+}
+
+func (uc *ArticlesUseCase) Update(ctx context.Context, a entity.Article) (*entity.Article, error) {
+	updatedArticleEntity, err := uc.repo.Update(context.Background(), a)
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesUseCase - Update - s.repo.Update: %w", err)
+	}
+
+	return updatedArticleEntity, nil
+}
+
+func (uc *ArticlesUseCase) Delete(ctx context.Context, id uint) (*entity.Article, error) {
+	deletedArticleEntity, err := uc.repo.Delete(context.Background(), id)
+	if err != nil {
+		return nil, fmt.Errorf("ArticlesUseCase - Delete - s.repo.Delete: %w", err)
+	}
+
+	return deletedArticleEntity, nil
 }
