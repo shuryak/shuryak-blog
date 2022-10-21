@@ -22,24 +22,25 @@ func New(pg *postgres.Postgres) *ArticlesRepo {
 	return &ArticlesRepo{pg}
 }
 
-func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (uint, error) {
+func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (*entity.Article, error) {
 	sql, args, err := r.Builder.
 		Insert("articles").
 		Columns("custom_id, author_id, title, thumbnail, content").
 		Values(a.CustomId, a.AuthorId, a.Title, a.Thumbnail, a.Content).
-		Suffix("RETURNING \"id\"").
+		Suffix("RETURNING *").
 		ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
+		return nil, fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
 	}
 
-	var id uint
 	row := r.Pool.QueryRow(ctx, sql, args...)
-	if err = row.Scan(&id); err != nil {
-		return 0, fmt.Errorf("ArticlesRepo - Create - row.Scan: %w", err)
+	newArticle := entity.Article{}
+	if err = row.Scan(&newArticle.Id, &newArticle.CustomId, &newArticle.AuthorId, &newArticle.Title,
+		&newArticle.Thumbnail, &newArticle.Content, &newArticle.CreatedAt); err != nil {
+		return nil, fmt.Errorf("ArticlesRepo - Create - row.Scan: %w", err)
 	}
 
-	return id, nil
+	return &newArticle, nil
 }
 
 func (r *ArticlesRepo) GetById(ctx context.Context, id uint) (*entity.Article, error) {

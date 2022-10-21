@@ -20,14 +20,9 @@ func New(r ArticlesRepo) *ArticlesUseCase {
 // TODO: deal with the context
 
 func (uc *ArticlesUseCase) Create(ctx context.Context, a entity.Article) (*entity.Article, error) {
-	id, err := uc.repo.Create(context.Background(), a)
+	articleEntity, err := uc.repo.Create(context.Background(), a)
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.Create: %w", err)
-	}
-
-	articleEntity, err := uc.repo.GetById(context.Background(), id)
-	if err != nil {
-		return nil, fmt.Errorf("ArticlesUseCase - Create - s.repo.GetById: %w", err)
 	}
 
 	return articleEntity, nil
