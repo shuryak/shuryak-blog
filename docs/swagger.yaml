@@ -24,14 +24,7 @@ definitions:
         example: How to ...
         type: string
     type: object
-  v1.articlesResponse:
-    properties:
-      articles:
-        items:
-          $ref: '#/definitions/v1.articleResponse'
-        type: array
-    type: object
-  v1.createArticleRequest:
+  v1.createRequest:
     properties:
       author_id:
         example: 42
@@ -59,9 +52,49 @@ definitions:
     - thumbnail
     - title
     type: object
+  v1.getManyResponse:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/v1.articleResponse'
+        type: array
+    type: object
   v1.response:
     properties:
       error: {}
+    type: object
+  v1.updateRequest:
+    properties:
+      author_id:
+        example: 42
+        type: integer
+      content:
+        additionalProperties: true
+        type: object
+      custom_id:
+        example: article-url
+        maxLength: 20
+        minLength: 3
+        type: string
+      id:
+        example: 1000
+        minimum: 0
+        type: integer
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        maxLength: 150
+        minLength: 5
+        type: string
+    required:
+    - author_id
+    - content
+    - custom_id
+    - id
+    - thumbnail
+    - title
     type: object
 host: localhost:8080
 info:
@@ -81,14 +114,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.createArticleRequest'
+          $ref: '#/definitions/v1.createRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.articlesResponse'
+            $ref: '#/definitions/v1.getManyResponse'
         "400":
           description: Bad Request
           schema:
@@ -98,11 +131,59 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Creates an article
+  /articles/delete:
+    delete:
+      description: Deletes article by ID
+      parameters:
+      - description: ID to delete
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.articleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Deletes article by ID
+  /articles/getById:
+    get:
+      description: Gets article by ID
+      parameters:
+      - description: ID to get
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.articleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Gets article by ID
   /articles/getMany:
     get:
-      consumes:
-      - application/json
-      description: Gets all articles
+      description: Gets collection of articles
       parameters:
       - description: offset to get
         in: query
@@ -120,10 +201,42 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.articlesResponse'
+            $ref: '#/definitions/v1.getManyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Gets all articles
+      summary: Gets collection of articles
+  /articles/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates article by ID
+      parameters:
+      - description: article to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.updateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.articleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Updates article by ID
 swagger: "2.0"

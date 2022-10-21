@@ -33,7 +33,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.createArticleRequest"
+                            "$ref": "#/definitions/v1.createRequest"
                         }
                     }
                 ],
@@ -41,7 +41,83 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.articlesResponse"
+                            "$ref": "#/definitions/v1.getManyResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/delete": {
+            "delete": {
+                "description": "Deletes article by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Deletes article by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID to delete",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.articleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/getById": {
+            "get": {
+                "description": "Gets article by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Gets article by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID to get",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.articleResponse"
                         }
                     },
                     "400": {
@@ -61,14 +137,11 @@ const docTemplate = `{
         },
         "/articles/getMany": {
             "get": {
-                "description": "Gets all articles",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Gets collection of articles",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Gets all articles",
+                "summary": "Gets collection of articles",
                 "parameters": [
                     {
                         "type": "integer",
@@ -89,7 +162,56 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.articlesResponse"
+                            "$ref": "#/definitions/v1.getManyResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/update": {
+            "put": {
+                "description": "Updates article by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Updates article by ID",
+                "parameters": [
+                    {
+                        "description": "article to update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.updateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.articleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
                         }
                     },
                     "500": {
@@ -136,18 +258,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.articlesResponse": {
-            "type": "object",
-            "properties": {
-                "articles": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.articleResponse"
-                    }
-                }
-            }
-        },
-        "v1.createArticleRequest": {
+        "v1.createRequest": {
             "type": "object",
             "required": [
                 "author_id",
@@ -183,10 +294,63 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.getManyResponse": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.articleResponse"
+                    }
+                }
+            }
+        },
         "v1.response": {
             "type": "object",
             "properties": {
                 "error": {}
+            }
+        },
+        "v1.updateRequest": {
+            "type": "object",
+            "required": [
+                "author_id",
+                "content",
+                "custom_id",
+                "id",
+                "thumbnail",
+                "title"
+            ],
+            "properties": {
+                "author_id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "content": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "custom_id": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3,
+                    "example": "article-url"
+                },
+                "id": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 1000
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "example": "https://smth.com/thumbnail.png"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 5,
+                    "example": "How to ..."
+                }
             }
         }
     }

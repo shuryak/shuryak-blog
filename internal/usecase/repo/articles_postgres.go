@@ -27,7 +27,8 @@ func (r *ArticlesRepo) Create(ctx context.Context, a entity.Article) (*entity.Ar
 		Insert("articles").
 		Columns("custom_id, author_id, title, thumbnail, content").
 		Values(a.CustomId, a.AuthorId, a.Title, a.Thumbnail, a.Content).
-		Suffix("RETURNING *").
+		Suffix("RETURNING \"id\", \"custom_id\", \"author_id\", \"title\", \"thumbnail\", \"content\", " +
+			"\"created_at\"").
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesRepo - Create - r.Builder: %w", err)
@@ -108,7 +109,8 @@ func (r *ArticlesRepo) Update(ctx context.Context, a entity.Article) (*entity.Ar
 	sql, args, err := r.Builder.
 		Update("articles").
 		SetMap(clauses).
-		Suffix("RETURNING *").
+		Suffix("RETURNING \"id\", \"custom_id\", \"author_id\", \"title\", \"thumbnail\", \"content\", " +
+			"\"created_at\"").
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesRepo - Update - r.Builder: %w", err)
