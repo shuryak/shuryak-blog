@@ -10,6 +10,8 @@ require (
 	github.com/jackc/pgx/v5 v5.0.1
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.3
+	github.com/rs/zerolog v1.28.0
+	github.com/swaggo/swag v1.8.6
 )
 
 require (
@@ -38,8 +40,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
-	github.com/rs/zerolog v1.28.0 // indirect
-	github.com/swaggo/swag v1.8.6 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/net v0.0.0-20221004154528-8021a29435af // indirect
