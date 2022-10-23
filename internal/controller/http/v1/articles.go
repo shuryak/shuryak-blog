@@ -2,10 +2,10 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/shuryak/shuryak-blog/internal/entity"
+	"github.com/shuryak/shuryak-blog/internal/usecase"
+	"github.com/shuryak/shuryak-blog/pkg/logger"
 	"net/http"
-	"shuryak-blog/internal/entity"
-	"shuryak-blog/internal/usecase"
-	"shuryak-blog/pkg/logger"
 	"time"
 )
 

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"shuryak-blog/internal/entity"
+	"github.com/shuryak/shuryak-blog/internal/entity"
 )
 
 type (

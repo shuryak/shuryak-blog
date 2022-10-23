@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/shuryak/shuryak-blog/config"
+	"github.com/shuryak/shuryak-blog/internal/app"
 	"log"
-	"shuryak-blog/config"
-	"shuryak-blog/internal/app"
 )
 
 func main() {

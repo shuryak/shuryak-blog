@@ -1,4 +1,4 @@
-module shuryak-blog
+module github.com/shuryak/shuryak-blog
 
 go 1.19
 

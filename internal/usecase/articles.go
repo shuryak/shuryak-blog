@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"shuryak-blog/internal/entity"
+	"github.com/shuryak/shuryak-blog/internal/entity"
 )
 
 type ArticlesUseCase struct {

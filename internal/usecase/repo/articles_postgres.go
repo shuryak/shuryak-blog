@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"shuryak-blog/internal/entity"
-	"shuryak-blog/internal/usecase"
-	"shuryak-blog/pkg/postgres"
+	"github.com/shuryak/shuryak-blog/internal/entity"
+	"github.com/shuryak/shuryak-blog/internal/usecase"
+	"github.com/shuryak/shuryak-blog/pkg/postgres"
 )
 
 const _defaultEntityCap = 64
