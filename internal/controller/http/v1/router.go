@@ -2,13 +2,13 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/shuryak/shuryak-blog/internal/usecase"
+	"github.com/shuryak/shuryak-blog/pkg/logger"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"shuryak-blog/internal/usecase"
-	"shuryak-blog/pkg/logger"
 
 	// Swagger docs
-	_ "shuryak-blog/docs"
+	_ "github.com/shuryak/shuryak-blog/docs"
 )
 
 // NewRouter - .
