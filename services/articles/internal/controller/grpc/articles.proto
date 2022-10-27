@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package articlesGrpc;
+option go_package = "./articles_grpc";
+
+import "google/protobuf/struct.proto";
+
+service Articles {
+  rpc Create(CreateRequest) returns (CreateResponse) {}
+}
+
+message CreateRequest {
+  string customId = 1;
+  uint32 authorId = 2;
+  string title = 3;
+  string thumbnail = 4;
+  google.protobuf.Struct content = 5;
+}
+
+message CreateResponse {
+  uint32 id = 1;
+  string customId = 2;
+  uint32 authorId = 3;
+  string title = 4;
+  string thumbnail = 5;
+  google.protobuf.Struct content = 6;
+}

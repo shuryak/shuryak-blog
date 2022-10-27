@@ -8,6 +8,7 @@ import (
 type (
 	Config struct {
 		App  `yaml:"app"`
+		GRPC `yaml:"grpc"`
 		HTTP `yaml:"http"`
 		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`
@@ -16,6 +17,10 @@ type (
 	App struct {
 		Name    string `yaml:"name" env:"APP_ENV"`
 		Version string `yaml:"version" env:"APP_VERSION"`
+	}
+
+	GRPC struct {
+		Port string `yaml:"port" env:"GRPC_PORT"`
 	}
 
 	HTTP struct {
