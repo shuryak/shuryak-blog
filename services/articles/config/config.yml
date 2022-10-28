@@ -2,6 +2,9 @@ app:
   name: 'shuryak-blog-articles-service'
   version: '1.0.0'
 
+grpc:
+  port: '50051'
+
 http:
   port: '8080'
 

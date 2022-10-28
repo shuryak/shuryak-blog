@@ -6,12 +6,15 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"github.com/shuryak/shuryak-blog/config"
+	grpccontroller "github.com/shuryak/shuryak-blog/internal/controller/grpc"
 	v1 "github.com/shuryak/shuryak-blog/internal/controller/http/v1"
 	"github.com/shuryak/shuryak-blog/internal/usecase"
 	"github.com/shuryak/shuryak-blog/internal/usecase/repo"
 	"github.com/shuryak/shuryak-blog/pkg/httpserver"
 	"github.com/shuryak/shuryak-blog/pkg/logger"
 	"github.com/shuryak/shuryak-blog/pkg/postgres"
+	"google.golang.org/grpc"
+	"net"
 	"os"
 	"os/signal"
 	"reflect"
@@ -44,6 +47,21 @@ func Run(cfg *config.Config) {
 			return name
 		})
 	}
+
+	// gRPC Server
+	go func() {
+		list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
+		if err != nil {
+			l.Fatal(fmt.Errorf("app - Run - net.Listen: %w", err))
+		}
+
+		s := grpc.NewServer() // TODO: to pkg
+		grpccontroller.NewArticlesGrpcServer(s, articlesUseCase, l)
+		err = s.Serve(list)
+		if err != nil {
+			l.Fatal(fmt.Errorf("app - Run - s.Server: %w", err))
+		}
+	}()
 
 	// HTTP Server
 	handler := gin.New()

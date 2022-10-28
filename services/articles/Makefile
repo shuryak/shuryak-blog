@@ -14,3 +14,11 @@ run:
 swagger:
 	xdg-open http://localhost:8080/swagger/index.html >/dev/null 2>&1
 .PHONY: swagger
+
+protoc:
+	protoc internal/controller/grpc/articles.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/
+.PHONY: protoc
+
+evans:
+	evans internal/controller/grpc/articles.proto -p 50051
+.PHONY: evans
