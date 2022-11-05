@@ -28,9 +28,9 @@ func NewPostgresUserStore(pg *postgres.Postgres) *PostgresUserStore {
 func (us *PostgresUserStore) Create(ctx context.Context, u entity.User) (*entity.User, error) {
 	sql, args, err := us.Builder.
 		Insert("users").
-		Columns("username", "hashed_password", "created_at").
-		Values(u.Username, u.HashedPassword, u.CreatedAt).
-		Suffix("RETURNING \"id\", \"username\", \"hashed_password\", \"created_at\"").
+		Columns("username", "hashed_password", "role", "created_at").
+		Values(u.Username, u.HashedPassword, u.Role, u.CreatedAt).
+		Suffix("RETURNING \"id\", \"username\", \"hashed_password\", \"role\", \"created_at\"").
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("UserStore - Create - us.Builder: %w", err)
@@ -47,7 +47,7 @@ func (us *PostgresUserStore) Create(ctx context.Context, u entity.User) (*entity
 
 func (us *PostgresUserStore) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
 	sql, args, err := us.Builder.
-		Select("id", "username", "hashed_password", "created_at").
+		Select("id", "username", "hashed_password", "role", "created_at").
 		From("users").
 		Where(squirrel.Eq{"username": username}).
 		PlaceholderFormat(squirrel.Dollar).
@@ -58,7 +58,7 @@ func (us *PostgresUserStore) GetByUsername(ctx context.Context, username string)
 
 	row := us.Pool.QueryRow(ctx, sql, args...)
 	u := entity.User{}
-	err = row.Scan(&u.Id, &u.Username, &u.HashedPassword, &u.CreatedAt)
+	err = row.Scan(&u.Id, &u.Username, &u.HashedPassword, &u.Role, &u.CreatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("UserStore - GetByUsername - row.Scan: %w", err)
 	}
