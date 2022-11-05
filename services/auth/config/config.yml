@@ -1,0 +1,12 @@
+app:
+  name: 'shuryak-blog-auth-service'
+  version: '1.0.0'
+
+grpc:
+  port: '50051'
+
+logger:
+  log_level: 'debug'
+
+postgres:
+  pool_max: 2
