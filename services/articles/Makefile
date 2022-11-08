@@ -16,7 +16,8 @@ swagger:
 .PHONY: swagger
 
 protoc:
-	protoc internal/controller/grpc/articles.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/
+	protoc internal/controller/grpc/articles.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/ && \
+	protoc internal/controller/grpc/auth.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/
 .PHONY: protoc
 
 evans:

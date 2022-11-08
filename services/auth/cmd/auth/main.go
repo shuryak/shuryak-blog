@@ -5,35 +5,14 @@ import (
 	"auth/internal"
 	grpccontroller "auth/internal/delivery/grpc"
 	"auth/internal/entity"
+	"auth/pkg/logger"
 	"auth/pkg/postgres"
 	"context"
-	"fmt"
 	"google.golang.org/grpc"
+	"log"
 	"net"
 	"time"
 )
-
-func unaryInterceptor(
-	ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler,
-) (resp interface{}, err error) {
-	// TODO: log
-	fmt.Println("--> unary interceptor: ", info.FullMethod)
-	return handler(ctx, req)
-}
-
-func streamInterceptor(
-	srv interface{},
-	stream grpc.ServerStream,
-	info *grpc.StreamServerInfo,
-	handler grpc.StreamHandler,
-) error {
-	// TODO: log
-	fmt.Println("--> unary interceptor: ", info.FullMethod)
-	return handler(srv, stream)
-}
 
 func seedUsers(us internal.UserStore) {
 	createUser(us, "mike", "password1", "user")
@@ -48,17 +27,22 @@ func createUser(us internal.UserStore, username, password, role string) (*entity
 	return us.Create(context.Background(), *user)
 }
 
+func accessibleRoles() map[string][]string {
+	return nil
+}
+
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		// TODO: log
-		fmt.Println("config error")
+		log.Fatalf("Config error: %s", err)
 	}
+
+	l := logger.New(cfg.Log.Level)
 
 	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
 	if err != nil {
-		// TODO: log
-		fmt.Println("postgres error")
+		l.Fatal("postgres error")
+		return
 	}
 	defer pg.Close()
 
@@ -69,22 +53,26 @@ func main() {
 
 	jwt := internal.NewJWTManager("super-secret", 10*time.Minute)
 
+	interceptor := internal.NewAuthInterceptor(jwt, accessibleRoles(), l)
+
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(unaryInterceptor),
-		grpc.StreamInterceptor(streamInterceptor),
+		grpc.UnaryInterceptor(interceptor.Unary()),
+		grpc.StreamInterceptor(interceptor.Stream()),
 	)
 
 	list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {
-		// TODO: log
-		fmt.Println("listen fatal error")
+		l.Fatal("listen fatal error")
+		return
 	}
 
 	grpccontroller.NewAuthServer(s, us, jwt, sm)
 
+	l.Info("Start GRPC server at %s", list.Addr())
+
 	err = s.Serve(list)
 	if err != nil {
-		// TODO: log
-		fmt.Println("serve fatal error")
+		l.Fatal("serve fatal error")
+		return
 	}
 }
