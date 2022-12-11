@@ -25,7 +25,8 @@ type articlesGRPCServer struct {
 func NewArticlesGrpcServer(server *grpc.Server, a usecase.Article, l logger.Interface) {
 	ags := &articlesGRPCServer{
 		a: a,
-		l: l}
+		l: l,
+	}
 	articles_grpc.RegisterArticlesServer(server, ags)
 	reflection.Register(server)
 }

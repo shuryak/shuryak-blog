@@ -6,7 +6,7 @@ grpc:
   port: '50051'
 
 http:
-  port: '8080'
+  port: '8081'
 
 logger:
   log_level: 'debug'

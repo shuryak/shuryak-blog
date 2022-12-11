@@ -38,7 +38,7 @@ func (us *PostgresUserStore) Create(ctx context.Context, u entity.User) (*entity
 
 	row := us.Pool.QueryRow(ctx, sql, args...)
 	newUser := entity.User{}
-	if err = row.Scan(&newUser.Id, &newUser.Username, &newUser.HashedPassword, &newUser.CreatedAt); err != nil {
+	if err = row.Scan(&newUser.Id, &newUser.Username, &newUser.HashedPassword, &newUser.Role, &newUser.CreatedAt); err != nil {
 		return nil, fmt.Errorf("UserStore - Create - row.Scan: %w", err)
 	}
 

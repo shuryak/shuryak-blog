@@ -53,6 +53,7 @@ func Run(cfg *config.Config) {
 		list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 		if err != nil {
 			l.Fatal(fmt.Errorf("app - Run - net.Listen: %w", err))
+			return
 		}
 
 		s := grpc.NewServer() // TODO: to pkg

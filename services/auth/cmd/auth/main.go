@@ -52,21 +52,15 @@ func main() {
 	sm := internal.NewSessionManager(uss, 64, 7*24*time.Hour)
 
 	jwt := internal.NewJWTManager("super-secret", 10*time.Minute)
-
-	interceptor := internal.NewAuthInterceptor(jwt, accessibleRoles(), l)
-
-	s := grpc.NewServer(
-		grpc.UnaryInterceptor(interceptor.Unary()),
-		grpc.StreamInterceptor(interceptor.Stream()),
-	)
-
 	list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
+
+	s := grpc.NewServer()
+	grpccontroller.NewAuthGRPCServer(s, us, jwt, sm)
+
 	if err != nil {
 		l.Fatal("listen fatal error")
 		return
 	}
-
-	grpccontroller.NewAuthServer(s, us, jwt, sm)
 
 	l.Info("Start GRPC server at %s", list.Addr())
 

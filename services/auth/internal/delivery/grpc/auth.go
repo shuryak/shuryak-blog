@@ -3,6 +3,7 @@ package grpc
 import (
 	"auth/internal"
 	"auth/internal/delivery/grpc/auth_grpc"
+	"auth/internal/entity"
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,7 +21,7 @@ type AuthGRPCServer struct {
 	auth_grpc.UnimplementedAuthServer
 }
 
-func NewAuthServer(s *grpc.Server, us internal.UserStore, jm *internal.JWTManager, sm *internal.SessionManager) {
+func NewAuthGRPCServer(s *grpc.Server, us internal.UserStore, jm *internal.JWTManager, sm *internal.SessionManager) {
 	as := &AuthGRPCServer{
 		userStore:      us,
 		jwtManager:     jm,
@@ -28,6 +29,28 @@ func NewAuthServer(s *grpc.Server, us internal.UserStore, jm *internal.JWTManage
 	}
 	auth_grpc.RegisterAuthServer(s, as)
 	reflection.Register(s)
+}
+
+func (s AuthGRPCServer) Register(ctx context.Context, req *auth_grpc.RegisterRequest) (
+	*auth_grpc.RegisterResponse,
+	error,
+) {
+	user, err := entity.NewUser(req.GetUsername(), req.GetPassword(), req.GetRole())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "password error: %w", err)
+	}
+
+	// TODO: handle already exists
+	createdUser, err := s.userStore.Create(ctx, *user)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot create user: %w", err)
+	}
+
+	return &auth_grpc.RegisterResponse{
+		Id:       uint32(createdUser.Id),
+		Username: createdUser.Username,
+		Role:     createdUser.Role,
+	}, nil
 }
 
 func (s AuthGRPCServer) Login(ctx context.Context, req *auth_grpc.LoginRequest) (*auth_grpc.LoginResponse, error) {
@@ -53,5 +76,26 @@ func (s AuthGRPCServer) Login(ctx context.Context, req *auth_grpc.LoginRequest) 
 	return &auth_grpc.LoginResponse{
 		AccessToken:  accessToken,
 		RefreshToken: session.RefreshToken,
+	}, nil
+}
+
+func (s AuthGRPCServer) Validate(ctx context.Context, req *auth_grpc.ValidateRequest) (
+	*auth_grpc.ValidateResponse,
+	error,
+) {
+	claims, err := s.jwtManager.Verify(req.GetAccessToken())
+
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "access token is bad")
+	}
+
+	user, err := s.userStore.GetByUsername(ctx, claims.Username)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "user not found")
+	}
+
+	return &auth_grpc.ValidateResponse{
+		UserId:   uint32(user.Id),
+		Username: user.Username,
 	}, nil
 }

@@ -1,6 +1,21 @@
 version: "3.9"
 
 services:
+  api-gateway:
+    build: services/api-gateway/.
+    image: api-gateway-service
+    container_name: api-gateway-service
+    networks:
+      - services-network
+    environment:
+      HTTP_PORT: 8080
+      AUTH_SVC_URL: auth:50052
+      ARTICLES_SVC_URL: articles:50051
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth
+      - articles
   articles:
     build: services/articles/.
     image: articles-service
@@ -9,13 +24,15 @@ services:
       - .env
     networks:
       - articles-db-network
+      - services-network
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       DB: $DB
       PG_URL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@articles-postgres:5432/$DB?sslmode=disable
     ports:
-      - "8080:8080"
+      - "50051:50051"
+      - "8081:8081"
     depends_on:
       - articles-postgres
   auth:
@@ -26,10 +43,11 @@ services:
       - .env
     networks:
       - auth-db-network
+      - services-network
     environment:
       PG_URL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@auth-postgres:5432/$DB?sslmode=disable
     ports:
-      - "50052:50051"
+      - "50052:50052"
     depends_on:
       - auth-postgres
   articles-postgres:
@@ -85,3 +103,4 @@ volumes:
 networks:
   articles-db-network:
   auth-db-network:
+  services-network:

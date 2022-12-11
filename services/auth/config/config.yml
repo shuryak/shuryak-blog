@@ -3,7 +3,7 @@ app:
   version: '1.0.0'
 
 grpc:
-  port: '50051'
+  port: '50052'
 
 logger:
   log_level: 'debug'
