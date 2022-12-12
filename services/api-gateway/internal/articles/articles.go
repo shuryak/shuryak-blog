@@ -25,11 +25,14 @@ func RegisterRoutes(engine *gin.Engine, cfg *config.Config, l logger.Interface) 
 
 	h1 := engine.Group("/articles").Use(a.AuthRequired)
 	{
-		h1.POST("/create", r.CreateArticle)
+		h1.POST("/create", r.Create)
+		h1.PUT("/update", r.Update)
+		h1.DELETE("/delete", r.Delete)
 	}
 
 	h2 := engine.Group("/articles")
 	{
 		h2.GET("/getById", r.GetById)
+		h2.GET("/getMany", r.GetMany)
 	}
 }

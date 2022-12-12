@@ -16,17 +16,17 @@ type CreateArticleRequest struct {
 	Content   map[string]interface{} `json:"content" binding:"required"`
 }
 
-func (r *Routes) CreateArticle(ctx *gin.Context) {
+func (r *Routes) Create(ctx *gin.Context) {
 	var req CreateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		r.l.Error(err, "articles - routes - CreateArticle")
+		r.l.Error(err, "articles - routes - Create")
 		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	content, err := structpb.NewStruct(req.Content)
 	if err != nil {
-		r.l.Error(err, "articles - routes - CreateArticle")
+		r.l.Error(err, "articles - routes - Create")
 		errors.ErrorResponse(ctx, http.StatusInternalServerError, "some problems")
 	}
 
@@ -40,7 +40,7 @@ func (r *Routes) CreateArticle(ctx *gin.Context) {
 		Content:   content,
 	})
 	if err != nil {
-		r.l.Error(err, "articles - routes - CreateArticle")
+		r.l.Error(err, "articles - routes - Create")
 		errors.ErrorResponse(ctx, http.StatusBadGateway, "service error")
 		return
 	}

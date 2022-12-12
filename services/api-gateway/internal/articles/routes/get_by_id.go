@@ -9,7 +9,7 @@ import (
 )
 
 type GetByIdRequest struct {
-	Id uint32 `json:"id" binding:"min=1,required" example:"article-url"`
+	Id uint32 `json:"id" binding:"min=1,required" example:"42"`
 }
 
 func (r *Routes) GetById(ctx *gin.Context) {
