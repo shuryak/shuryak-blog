@@ -2,31 +2,32 @@ package routes
 
 import (
 	"api-gateway/internal/auth/pb"
+	"api-gateway/internal/errors"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type LoginRequestBody struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `form:"username" binding:"min=2,max=20,required"`
+	Password string `form:"password" binding:"min=8,max=64,required"`
 }
 
-func Login(ctx *gin.Context, c pb.AuthClient) {
-	req := LoginRequestBody{}
-
-	if err := ctx.BindJSON(&req); err != nil {
-		_ = ctx.AbortWithError(http.StatusBadRequest, err)
+func (r *Routes) Login(ctx *gin.Context) {
+	var req LoginRequestBody
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		r.l.Error(err, "auth - routes - Login")
+		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
-	res, err := c.Login(context.Background(), &pb.LoginRequest{
+	res, err := r.c.Login(context.Background(), &pb.LoginRequest{
 		Username: req.Username,
 		Password: req.Password,
 	})
-
 	if err != nil {
-		_ = ctx.AbortWithError(http.StatusBadGateway, err)
+		r.l.Error(err, "auth - routes - Login")
+		errors.ErrorResponse(ctx, http.StatusBadGateway, "service error")
 		return
 	}
 

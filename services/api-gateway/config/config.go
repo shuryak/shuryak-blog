@@ -9,6 +9,7 @@ type (
 	Config struct {
 		HTTP     `yaml:"http"`
 		Services `yaml:"services"`
+		Log      `yaml:"logger"`
 	}
 
 	HTTP struct {
@@ -18,6 +19,10 @@ type (
 	Services struct {
 		AuthURL     string `yaml:"auth_url" env:"AUTH_SVC_URL"`
 		ArticlesURL string `yaml:"articles_url" env:"ARTICLES_SVC_URL"`
+	}
+
+	Log struct {
+		Level string `env-required:"true" yaml:"log_level" env:"LOG_LEVEL"`
 	}
 )
 

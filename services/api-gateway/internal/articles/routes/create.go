@@ -2,6 +2,7 @@ package routes
 
 import (
 	"api-gateway/internal/articles/pb"
+	"api-gateway/internal/errors"
 	"context"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -15,31 +16,33 @@ type CreateArticleRequest struct {
 	Content   map[string]interface{} `json:"content" binding:"required"`
 }
 
-func CreateArticle(ctx *gin.Context, c pb.ArticlesClient) {
-	req := CreateArticleRequest{}
-
-	if err := ctx.BindJSON(&req); err != nil {
-		_ = ctx.AbortWithError(http.StatusBadRequest, err)
+func (r *Routes) CreateArticle(ctx *gin.Context) {
+	var req CreateArticleRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		r.l.Error(err, "articles - routes - CreateArticle")
+		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	content, err := structpb.NewStruct(req.Content)
 	if err != nil {
-		_ = ctx.AbortWithError(http.StatusBadRequest, err)
+		r.l.Error(err, "articles - routes - CreateArticle")
+		errors.ErrorResponse(ctx, http.StatusInternalServerError, "some problems")
 	}
 
 	authorId, _ := ctx.Get("user_id")
 
-	res, err := c.Create(context.Background(), &pb.CreateRequest{
+	res, err := r.c.Create(context.Background(), &pb.CreateRequest{
 		CustomId:  req.CustomId,
 		AuthorId:  authorId.(uint32),
 		Title:     req.Title,
 		Thumbnail: req.Thumbnail,
 		Content:   content,
 	})
-
 	if err != nil {
-		_ = ctx.AbortWithError(http.StatusBadGateway, err)
+		r.l.Error(err, "articles - routes - CreateArticle")
+		errors.ErrorResponse(ctx, http.StatusBadGateway, "service error")
+		return
 	}
 
 	ctx.JSON(http.StatusCreated, &res)

@@ -8,16 +8,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type ServiceClient struct {
-	Client pb.ArticlesClient
-}
-
-func NewServiceClient(cfg *config.Config) pb.ArticlesClient {
+func NewServiceClient(cfg *config.Config) (pb.ArticlesClient, error) {
 	cc, err := grpc.Dial(cfg.Services.ArticlesURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
-		_ = fmt.Errorf("internal - articles - new")
+		return nil, fmt.Errorf("internal - articles - NewServiceClient: %w", err)
 	}
 
-	return pb.NewArticlesClient(cc)
+	return pb.NewArticlesClient(cc), nil
 }
