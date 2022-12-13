@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/structpb"
-	"time"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Check for implementation
@@ -60,6 +60,7 @@ func (g articlesGRPCServer) Create(ctx context.Context, request *articles_grpc.C
 		Title:     article.Title,
 		Thumbnail: article.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(article.CreatedAt),
 	}
 
 	return &sar, nil
@@ -88,6 +89,7 @@ func (g articlesGRPCServer) GetById(ctx context.Context, request *articles_grpc.
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(a.CreatedAt),
 	}
 
 	return &sar, nil
@@ -118,6 +120,7 @@ func (g articlesGRPCServer) GetMany(ctx context.Context, request *articles_grpc.
 			Title:     a.Title,
 			Thumbnail: a.Thumbnail,
 			Content:   content,
+			CreatedAt: timestamppb.New(a.CreatedAt),
 		}
 	}
 
@@ -135,7 +138,6 @@ func (g articlesGRPCServer) Update(ctx context.Context, request *articles_grpc.U
 		Title:     request.Title,
 		Thumbnail: request.Thumbnail,
 		Content:   request.Content.AsMap(),
-		CreatedAt: time.Time{},
 	})
 	if err != nil {
 		g.l.Error(err, "grpc - Update")
@@ -155,6 +157,7 @@ func (g articlesGRPCServer) Update(ctx context.Context, request *articles_grpc.U
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(a.CreatedAt),
 	}
 
 	return &sar, nil
@@ -183,6 +186,7 @@ func (g articlesGRPCServer) Delete(ctx context.Context, request *articles_grpc.A
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(a.CreatedAt),
 	}
 
 	return &sar, nil

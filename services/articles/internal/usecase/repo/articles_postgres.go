@@ -110,8 +110,7 @@ func (r *ArticlesRepo) Update(ctx context.Context, a entity.Article) (*entity.Ar
 		Update("articles").
 		SetMap(clauses).
 		Where(squirrel.Eq{"id": a.Id}).
-		Suffix("RETURNING \"id\", \"custom_id\", \"author_id\", \"title\", \"thumbnail\", \"content\", " +
-			"\"created_at\"").
+		Suffix("RETURNING \"id\", \"custom_id\", \"author_id\", \"title\", \"thumbnail\", \"content\", \"created_at\"").
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("ArticlesRepo - Update - r.Builder: %w", err)
