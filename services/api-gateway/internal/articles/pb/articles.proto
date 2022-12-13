@@ -4,6 +4,7 @@ package articlesGrpc;
 option go_package = "./pb";
 
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 service Articles {
   rpc Create(CreateRequest) returns (SingleArticleResponse);
@@ -28,6 +29,7 @@ message SingleArticleResponse {
   string title = 4;
   string thumbnail = 5;
   google.protobuf.Struct content = 6;
+  google.protobuf.Timestamp createdAt = 7;
 }
 
 message ArticleIdRequest {

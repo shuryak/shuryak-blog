@@ -17,7 +17,7 @@ func RegisterRoutes(engine *gin.Engine, cfg *config.Config, l logger.Interface) 
 
 	h := engine.Group("/auth")
 	{
-		h.POST("/register", r.Register)
+		h.GET("/register", r.Register)
 		h.GET("/login", r.Login)
 	}
 }

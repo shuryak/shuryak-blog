@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/structpb"
 	"net/http"
+	"time"
 )
 
 type UpdateRequest struct {
@@ -17,6 +18,27 @@ type UpdateRequest struct {
 	Content   map[string]interface{} `json:"content" binding:"required"`
 }
 
+type UpdateResponse struct {
+	Id        uint32                 `json:"id" example:"1000"`
+	CustomId  string                 `json:"custom_id" example:"article-url"`
+	AuthorId  uint32                 `json:"author_id" example:"42"`
+	Title     string                 `json:"title" example:"How to ..."`
+	Thumbnail string                 `json:"thumbnail" example:"https://smth.com/thumbnail.png"`
+	Content   map[string]interface{} `json:"content"`
+	CreatedAt time.Time              `json:"created_at" example:"2022-10-07T14:26:06.510465Z"`
+}
+
+// Update
+// @Summary     Updates article by ID
+// @Description Updates article by ID
+// @Accept      json
+// @Produce     json
+// @Param       request body     UpdateRequest true "article to update"
+// @Success     200     {object} UpdateResponse
+// @Failure     400     {object} errors.Response
+// @Failure     500     {object} errors.Response
+// @Failure     502     {object} errors.Response
+// @Router      /articles/update [put]
 func (r *Routes) Update(ctx *gin.Context) {
 	var req UpdateRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -33,7 +55,7 @@ func (r *Routes) Update(ctx *gin.Context) {
 
 	authorId, _ := ctx.Get("user_id")
 
-	res, err := r.c.Update(context.Background(), &pb.UpdateRequest{
+	article, err := r.c.Update(context.Background(), &pb.UpdateRequest{
 		Id:        req.Id,
 		CustomId:  req.CustomId,
 		AuthorId:  authorId.(uint32),
@@ -41,11 +63,20 @@ func (r *Routes) Update(ctx *gin.Context) {
 		Thumbnail: req.Thumbnail,
 		Content:   content,
 	})
-
 	if err != nil {
 		r.l.Error(err, "articles - routes - Update")
 		errors.ErrorResponse(ctx, http.StatusBadGateway, "service error")
 		return
+	}
+
+	res := UpdateResponse{
+		Id:        article.Id,
+		CustomId:  article.CustomId,
+		AuthorId:  article.AuthorId,
+		Title:     article.Title,
+		Thumbnail: article.Thumbnail,
+		Content:   article.Content.AsMap(),
+		CreatedAt: article.CreatedAt.AsTime(),
 	}
 
 	ctx.JSON(http.StatusOK, &res)

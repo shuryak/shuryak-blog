@@ -13,6 +13,16 @@ type LoginRequestBody struct {
 	Password string `form:"password" binding:"min=8,max=64,required"`
 }
 
+// Login
+// @Summary     Method to login
+// @Description Gets access and refresh tokens
+// @Produce  	json
+// @Param  	 	username query int true "Username"
+// @Param  	 	password query int true "User password"
+// @Success     200   	 {object} pb.LoginResponse
+// @Failure     400      {object} errors.Response
+// @Failure     502      {object} errors.Response
+// @Router      /auth/login [get]
 func (r *Routes) Login(ctx *gin.Context) {
 	var req LoginRequestBody
 	if err := ctx.ShouldBindQuery(&req); err != nil {

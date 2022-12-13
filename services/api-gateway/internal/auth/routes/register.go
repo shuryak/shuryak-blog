@@ -9,13 +9,23 @@ import (
 )
 
 type RegisterRequestBody struct {
-	Username string `json:"username" binding:"min=2,max=20,required"`
-	Password string `json:"password" binding:"min=8,max=64,required"`
+	Username string `form:"username" binding:"min=2,max=20,required"`
+	Password string `form:"password" binding:"min=8,max=64,required"`
 }
 
+// Register
+// @Summary     Method to register
+// @Description User registration
+// @Produce  	json
+// @Param  	 	username query int true "Username"
+// @Param  	 	password query int true "User password"
+// @Success     200   	 {object} pb.RegisterResponse
+// @Failure     400      {object} errors.Response
+// @Failure     502      {object} errors.Response
+// @Router      /auth/register [get]
 func (r *Routes) Register(ctx *gin.Context) {
 	var req RegisterRequestBody
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		r.l.Error(err, "auth - routes - Register")
 		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
 		return
