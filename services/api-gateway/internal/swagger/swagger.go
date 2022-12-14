@@ -12,9 +12,9 @@ import (
 )
 
 // RegisterSwagger godoc
-// @securityDefinitions.apikey  BearerAuth
-// @in                          header
-// @name                        Authorization
+// @securityDefinitions.apikey BearerAuth
+// @in                         header
+// @name                       Authorization
 func RegisterSwagger(engine *gin.Engine, cfg *config.Config, l logger.Interface) {
 	engine.Use(gin.Logger())
 	engine.Use(gin.Recovery())

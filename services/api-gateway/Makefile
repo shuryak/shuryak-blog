@@ -4,7 +4,7 @@ PG_URL := postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${DB}?
 export PG_URL
 
 gen:
-	swag init -g internal/articles/articles.go
+	swag init -g internal/swagger/swagger.go
 .PHONY: gen
 
 swagger:
