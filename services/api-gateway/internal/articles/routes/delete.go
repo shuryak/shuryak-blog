@@ -2,39 +2,25 @@ package routes
 
 import (
 	"api-gateway/internal/articles/pb"
+	"api-gateway/internal/dto"
 	"api-gateway/internal/errors"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 )
-
-type DeleteRequest struct {
-	Id uint32 `form:"id" binding:"min=1,required" example:"article-url"`
-}
-
-type DeleteResponse struct {
-	Id        uint32                 `json:"id" example:"1000"`
-	CustomId  string                 `json:"custom_id" example:"article-url"`
-	AuthorId  uint32                 `json:"author_id" example:"42"`
-	Title     string                 `json:"title" example:"How to ..."`
-	Thumbnail string                 `json:"thumbnail" example:"https://smth.com/thumbnail.png"`
-	Content   map[string]interface{} `json:"content"`
-	CreatedAt time.Time              `json:"created_at" example:"2022-10-07T14:26:06.510465Z"`
-}
 
 // Delete godoc
 // @Summary     Deletes article by ID
 // @Description Deletes article by ID
 // @Produce  	json
 // @Param  	 	id query int true "ID to delete"
-// @Success     200   	 {object} DeleteResponse
+// @Success     200   	 {object} dto.SingleArticleResponse
 // @Failure     400      {object} errors.Response
 // @Failure     502      {object} errors.Response
 // @Router      /articles/delete [delete]
 // @Security 	BearerAuth
 func (r *Routes) Delete(ctx *gin.Context) {
-	var req DeleteRequest
+	var req dto.ArticleIdRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		r.l.Error(err, "articles - routes - Delete")
 		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
@@ -50,7 +36,7 @@ func (r *Routes) Delete(ctx *gin.Context) {
 		return
 	}
 
-	res := DeleteResponse{
+	res := dto.SingleArticleResponse{
 		Id:        article.Id,
 		CustomId:  article.CustomId,
 		AuthorId:  article.AuthorId,

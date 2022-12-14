@@ -2,6 +2,7 @@ package routes
 
 import (
 	"api-gateway/internal/articles/pb"
+	"api-gateway/internal/dto"
 	"api-gateway/internal/errors"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -13,17 +14,13 @@ type GetManyRequest struct {
 	Count  uint32 `form:"count" binding:"min=1,required" example:"10"`
 }
 
-type GetManyResponse struct {
-	Articles []GetByIdResponse `json:"articles"`
-}
-
 // GetMany godoc
 // @Summary     Gets collection of articles
 // @Description Gets collection of articles
 // @Produce  	json
 // @Param   	offset query int true "offset to get"
 // @Param   	count  query int true "count to get"
-// @Success     200   	 {object} GetManyResponse
+// @Success     200   	 {object} dto.ManyArticlesResponse
 // @Failure     400      {object} errors.Response
 // @Failure     502      {object} errors.Response
 // @Router      /articles/getMany [get]
@@ -45,9 +42,9 @@ func (r *Routes) GetMany(ctx *gin.Context) {
 		return
 	}
 
-	res := GetManyResponse{Articles: make([]GetByIdResponse, len(articles.Articles))}
+	res := dto.ManyArticlesResponse{Articles: make([]dto.SingleArticleResponse, len(articles.Articles))}
 	for i, a := range articles.Articles {
-		res.Articles[i] = GetByIdResponse{
+		res.Articles[i] = dto.SingleArticleResponse{
 			Id:        a.Id,
 			CustomId:  a.CustomId,
 			AuthorId:  a.AuthorId,
