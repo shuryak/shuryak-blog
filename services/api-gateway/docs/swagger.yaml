@@ -388,9 +388,4 @@ paths:
           schema:
             $ref: '#/definitions/errors.Response'
       summary: Method to register
-securityDefinitions:
-  BearerAuth:
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

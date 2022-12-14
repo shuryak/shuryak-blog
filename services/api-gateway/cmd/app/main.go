@@ -4,6 +4,7 @@ import (
 	"api-gateway/config"
 	"api-gateway/internal/articles"
 	"api-gateway/internal/auth"
+	"api-gateway/internal/swagger"
 	"api-gateway/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -35,6 +36,7 @@ func main() {
 
 	engine := gin.New()
 
+	swagger.RegisterSwagger(engine, cfg, l)
 	articles.RegisterRoutes(engine, cfg, l)
 	auth.RegisterRoutes(engine, cfg, l)
 
