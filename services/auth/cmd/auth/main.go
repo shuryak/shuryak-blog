@@ -15,8 +15,8 @@ import (
 )
 
 func seedUsers(us internal.UserStore) {
-	createUser(us, "mike", "password1", "user")
-	createUser(us, "john", "password2", "admin")
+	createUser(us, "shuryak", "password", "user")
+	createUser(us, "admin", "password", "admin")
 }
 
 func createUser(us internal.UserStore, username, password, role string) (*entity.User, error) {
@@ -25,10 +25,6 @@ func createUser(us internal.UserStore, username, password, role string) (*entity
 		return nil, err
 	}
 	return us.Create(context.Background(), *user)
-}
-
-func accessibleRoles() map[string][]string {
-	return nil
 }
 
 func main() {
