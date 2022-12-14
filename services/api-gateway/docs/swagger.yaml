@@ -1,4 +1,35 @@
 definitions:
+  dto.ManyArticlesResponse:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/dto.SingleArticleResponse'
+        type: array
+    type: object
+  dto.SingleArticleResponse:
+    properties:
+      author_id:
+        example: 42
+        type: integer
+      content:
+        additionalProperties: true
+        type: object
+      created_at:
+        example: "2022-10-07T14:26:06.510465Z"
+        type: string
+      custom_id:
+        example: article-url
+        type: string
+      id:
+        example: 1000
+        type: integer
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        type: string
+    type: object
   errors.Response:
     properties:
       error: {}
@@ -43,85 +74,6 @@ definitions:
     - thumbnail
     - title
     type: object
-  routes.CreateResponse:
-    properties:
-      author_id:
-        example: 42
-        type: integer
-      content:
-        additionalProperties: true
-        type: object
-      created_at:
-        example: "2022-10-07T14:26:06.510465Z"
-        type: string
-      custom_id:
-        example: article-url
-        type: string
-      id:
-        example: 1000
-        type: integer
-      thumbnail:
-        example: https://smth.com/thumbnail.png
-        type: string
-      title:
-        example: How to ...
-        type: string
-    type: object
-  routes.DeleteResponse:
-    properties:
-      author_id:
-        example: 42
-        type: integer
-      content:
-        additionalProperties: true
-        type: object
-      created_at:
-        example: "2022-10-07T14:26:06.510465Z"
-        type: string
-      custom_id:
-        example: article-url
-        type: string
-      id:
-        example: 1000
-        type: integer
-      thumbnail:
-        example: https://smth.com/thumbnail.png
-        type: string
-      title:
-        example: How to ...
-        type: string
-    type: object
-  routes.GetByIdResponse:
-    properties:
-      author_id:
-        example: 42
-        type: integer
-      content:
-        additionalProperties: true
-        type: object
-      created_at:
-        example: "2022-10-07T14:26:06.510465Z"
-        type: string
-      custom_id:
-        example: article-url
-        type: string
-      id:
-        example: 1000
-        type: integer
-      thumbnail:
-        example: https://smth.com/thumbnail.png
-        type: string
-      title:
-        example: How to ...
-        type: string
-    type: object
-  routes.GetManyResponse:
-    properties:
-      articles:
-        items:
-          $ref: '#/definitions/routes.GetByIdResponse'
-        type: array
-    type: object
   routes.UpdateRequest:
     properties:
       content:
@@ -151,30 +103,6 @@ definitions:
     - thumbnail
     - title
     type: object
-  routes.UpdateResponse:
-    properties:
-      author_id:
-        example: 42
-        type: integer
-      content:
-        additionalProperties: true
-        type: object
-      created_at:
-        example: "2022-10-07T14:26:06.510465Z"
-        type: string
-      custom_id:
-        example: article-url
-        type: string
-      id:
-        example: 1000
-        type: integer
-      thumbnail:
-        example: https://smth.com/thumbnail.png
-        type: string
-      title:
-        example: How to ...
-        type: string
-    type: object
 info:
   contact: {}
 paths:
@@ -196,7 +124,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.CreateResponse'
+            $ref: '#/definitions/dto.SingleArticleResponse'
         "400":
           description: Bad Request
           schema:
@@ -227,7 +155,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.DeleteResponse'
+            $ref: '#/definitions/dto.SingleArticleResponse'
         "400":
           description: Bad Request
           schema:
@@ -254,7 +182,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.GetByIdResponse'
+            $ref: '#/definitions/dto.SingleArticleResponse'
         "400":
           description: Bad Request
           schema:
@@ -284,7 +212,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.GetManyResponse'
+            $ref: '#/definitions/dto.ManyArticlesResponse'
         "400":
           description: Bad Request
           schema:
@@ -312,7 +240,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.UpdateResponse'
+            $ref: '#/definitions/dto.SingleArticleResponse'
         "400":
           description: Bad Request
           schema:

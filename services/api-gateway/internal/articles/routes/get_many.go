@@ -10,8 +10,9 @@ import (
 )
 
 type GetManyRequest struct {
-	Offset uint32 `form:"offset" binding:"min=0,required" example:"42"`
-	Count  uint32 `form:"count" binding:"min=1,required" example:"10"`
+	// https://github.com/go-playground/validator/issues/290#issuecomment-316062118
+	Offset *uint32 `form:"offset" binding:"min=0,required" example:"42"`
+	Count  uint32  `form:"count" binding:"min=1,required" example:"10"`
 }
 
 // GetMany godoc
@@ -33,7 +34,7 @@ func (r *Routes) GetMany(ctx *gin.Context) {
 	}
 
 	articles, err := r.c.GetMany(context.Background(), &pb.GetManyRequest{
-		Offset: req.Offset,
+		Offset: *req.Offset,
 		Count:  req.Count,
 	})
 	if err != nil {
