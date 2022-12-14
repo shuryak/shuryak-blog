@@ -13,6 +13,10 @@ import (
 	_ "api-gateway/docs"
 )
 
+// RegisterRoutes godoc
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
 func RegisterRoutes(engine *gin.Engine, cfg *config.Config, l logger.Interface) {
 	engine.Use(gin.Logger())
 	engine.Use(gin.Recovery())

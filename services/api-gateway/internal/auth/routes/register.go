@@ -13,12 +13,12 @@ type RegisterRequestBody struct {
 	Password string `form:"password" binding:"min=8,max=64,required"`
 }
 
-// Register
+// Register godoc
 // @Summary     Method to register
 // @Description User registration
 // @Produce  	json
-// @Param  	 	username query int true "Username"
-// @Param  	 	password query int true "User password"
+// @Param  	 	username query string true "Username"
+// @Param  	 	password query string true "User password"
 // @Success     200   	 {object} pb.RegisterResponse
 // @Failure     400      {object} errors.Response
 // @Failure     502      {object} errors.Response

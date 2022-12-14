@@ -27,7 +27,7 @@ type CreateResponse struct {
 	CreatedAt time.Time              `json:"created_at" example:"2022-10-07T14:26:06.510465Z"`
 }
 
-// Create
+// Create godoc
 // @Summary     Creates an article
 // @Description Creates an article
 // @Accept      json
@@ -38,6 +38,7 @@ type CreateResponse struct {
 // @Failure     500     {object} errors.Response
 // @Failure     502     {object} errors.Response
 // @Router      /articles/create [post]
+// @Security 	BearerAuth
 func (r *Routes) Create(ctx *gin.Context) {
 	var req CreateRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

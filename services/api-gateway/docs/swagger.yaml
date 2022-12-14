@@ -209,6 +209,8 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
       summary: Creates an article
   /articles/delete:
     delete:
@@ -234,6 +236,8 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
       summary: Deletes article by ID
   /articles/getById:
     get:
@@ -321,6 +325,8 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
       summary: Updates article by ID
   /auth/login:
     get:
@@ -330,12 +336,12 @@ paths:
         in: query
         name: username
         required: true
-        type: integer
+        type: string
       - description: User password
         in: query
         name: password
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -360,12 +366,12 @@ paths:
         in: query
         name: username
         required: true
-        type: integer
+        type: string
       - description: User password
         in: query
         name: password
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -382,4 +388,9 @@ paths:
           schema:
             $ref: '#/definitions/errors.Response'
       summary: Method to register
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

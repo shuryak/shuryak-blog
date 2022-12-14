@@ -23,7 +23,7 @@ type DeleteResponse struct {
 	CreatedAt time.Time              `json:"created_at" example:"2022-10-07T14:26:06.510465Z"`
 }
 
-// Delete
+// Delete godoc
 // @Summary     Deletes article by ID
 // @Description Deletes article by ID
 // @Produce  	json
@@ -32,6 +32,7 @@ type DeleteResponse struct {
 // @Failure     400      {object} errors.Response
 // @Failure     502      {object} errors.Response
 // @Router      /articles/delete [delete]
+// @Security 	BearerAuth
 func (r *Routes) Delete(ctx *gin.Context) {
 	var req DeleteRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -58,6 +59,6 @@ func (r *Routes) Delete(ctx *gin.Context) {
 		Content:   article.Content.AsMap(),
 		CreatedAt: article.CreatedAt.AsTime(),
 	}
-	
+
 	ctx.JSON(http.StatusOK, &res)
 }

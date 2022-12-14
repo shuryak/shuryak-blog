@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/articles/create": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates an article",
                 "consumes": [
                     "application/json"
@@ -67,6 +72,11 @@ const docTemplate = `{
         },
         "/articles/delete": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes article by ID",
                 "produces": [
                     "application/json"
@@ -188,6 +198,11 @@ const docTemplate = `{
         },
         "/articles/update": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates article by ID",
                 "consumes": [
                     "application/json"
@@ -244,14 +259,14 @@ const docTemplate = `{
                 "summary": "Method to login",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Username",
                         "name": "username",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User password",
                         "name": "password",
                         "in": "query",
@@ -289,14 +304,14 @@ const docTemplate = `{
                 "summary": "Method to register",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Username",
                         "name": "username",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User password",
                         "name": "password",
                         "in": "query",
@@ -568,6 +583,13 @@ const docTemplate = `{
                     "example": "How to ..."
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

@@ -17,7 +17,7 @@ type GetManyResponse struct {
 	Articles []GetByIdResponse `json:"articles"`
 }
 
-// GetMany
+// GetMany godoc
 // @Summary     Gets collection of articles
 // @Description Gets collection of articles
 // @Produce  	json

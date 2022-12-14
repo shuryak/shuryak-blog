@@ -28,7 +28,7 @@ type UpdateResponse struct {
 	CreatedAt time.Time              `json:"created_at" example:"2022-10-07T14:26:06.510465Z"`
 }
 
-// Update
+// Update godoc
 // @Summary     Updates article by ID
 // @Description Updates article by ID
 // @Accept      json
@@ -39,6 +39,7 @@ type UpdateResponse struct {
 // @Failure     500     {object} errors.Response
 // @Failure     502     {object} errors.Response
 // @Router      /articles/update [put]
+// @Security 	BearerAuth
 func (r *Routes) Update(ctx *gin.Context) {
 	var req UpdateRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
