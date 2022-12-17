@@ -17,6 +17,6 @@ FROM scratch
 COPY --from=builder /app/config /config
 COPY --from=builder /bin/app /app
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /app/cert /cert
+COPY --from=builder /app/certs/ /etc/ssl/certs/
 ENV GIN_MODE=debug
 CMD ["/app"]

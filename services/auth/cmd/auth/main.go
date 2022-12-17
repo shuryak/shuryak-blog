@@ -30,7 +30,7 @@ func createUser(us internal.UserStore, username, password, role string) (*entity
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		log.Fatalf("Config error: %s", err)
+		log.Fatalf("Config error: %v", err)
 	}
 
 	l := logger.New(cfg.Log.Level)
@@ -47,7 +47,11 @@ func main() {
 	uss := internal.NewPostgresUserSessionStore(pg)
 	sm := internal.NewSessionManager(uss, 64, 7*24*time.Hour)
 
-	jwt := internal.NewJWTManager("cert/ed25519key.pem", "cert/ed25519key.pem.pub", 10*time.Minute)
+	jwt, err := internal.NewJWTManager(cfg.Certs.PrivateKeyPEMPath, cfg.Certs.PublicKeyPEMPath, 10*time.Minute)
+	if err != nil {
+		log.Fatalf("Certs error: %v", err)
+	}
+
 	list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 
 	s := grpc.NewServer()
@@ -58,7 +62,7 @@ func main() {
 		return
 	}
 
-	l.Info("Start GRPC server at %s", list.Addr())
+	l.Info("Start GRPC server at %v", list.Addr())
 
 	err = s.Serve(list)
 	if err != nil {

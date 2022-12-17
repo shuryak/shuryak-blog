@@ -1,4 +1,3 @@
-cert/
 *.exe
 *.exe~
 *.dll
@@ -11,3 +10,5 @@ go.work
 /Godeps/
 .idea
 .vscode
+
+certs/

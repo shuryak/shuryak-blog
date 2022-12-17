@@ -15,8 +15,13 @@ evans:
 	evans internal/delivery/grpc/auth.proto -p 50052
 .PHONY: evans
 
-cert:
-	mkdir -p cert
-	openssl genpkey -algorithm Ed25519 -out cert/ed25519key.pem
-	openssl pkey -in cert/ed25519key.pem -pubout -out cert/ed25519key.pem.pub
-.PHONY: cert
+certs:
+	mkdir -p certs
+	openssl genpkey -algorithm Ed25519 -out certs/ed25519key.pem
+	openssl pkey -in certs/ed25519key.pem -pubout -out certs/ed25519key.pem.pub
+.PHONY: certs
+
+remove-certs:
+	rm certs/ed25519key.pem
+	rm certs/ed25519key.pem.pub
+.PHONY: remove-certs

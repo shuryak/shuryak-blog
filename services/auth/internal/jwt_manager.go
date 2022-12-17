@@ -2,15 +2,16 @@ package internal
 
 import (
 	"auth/internal/entity"
+	"crypto"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
 
 type JWTManager struct {
-	privatePemKeyPath string
-	publicPemKeyPath  string
-	tokenDuration     time.Duration
+	privateKey    crypto.PrivateKey
+	publicKey     crypto.PublicKey
+	tokenDuration time.Duration
 }
 
 type UserClaims struct {
@@ -20,8 +21,18 @@ type UserClaims struct {
 	Role     string `json:"role"`
 }
 
-func NewJWTManager(privatePemKeyPath, publicPemKeyPath string, tokenDuration time.Duration) *JWTManager {
-	return &JWTManager{privatePemKeyPath, publicPemKeyPath, tokenDuration}
+func NewJWTManager(privateKeyPEMPath, publicKeyPEMPath string, tokenDuration time.Duration) (*JWTManager, error) {
+	privateKey, err := ParseEd25519PrivateKey(privateKeyPEMPath)
+	if err != nil {
+		return nil, fmt.Errorf("read ed25519 private key error: %w", err)
+	}
+
+	publicKey, err := ParseEd25519PublicKey(publicKeyPEMPath)
+	if err != nil {
+		return nil, fmt.Errorf("read ed25519 public key error: %w", err)
+	}
+
+	return &JWTManager{privateKey, publicKey, tokenDuration}, nil
 }
 
 func (m *JWTManager) Generate(user *entity.User) (string, error) {
@@ -35,32 +46,17 @@ func (m *JWTManager) Generate(user *entity.User) (string, error) {
 		Role:     user.Role,
 	}
 
-	var Ed25519SigningMethod jwt.SigningMethodEd25519
-
-	jwt.RegisterSigningMethod(Ed25519SigningMethod.Alg(), func() jwt.SigningMethod { return &Ed25519SigningMethod })
-
 	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
-	//token := jwt.NewWithClaims(&Ed25519SigningMethod, claims)
 
-	privateKey, err := ParseEd25519PrivateKey(m.privatePemKeyPath)
+	jwtString, err := token.SignedString(m.privateKey)
 	if err != nil {
-		return "", fmt.Errorf("read ed25519 private key error: %w", err)
-	}
-
-	jwtString, err := token.SignedString(privateKey)
-	if err != nil {
-		return "", fmt.Errorf("generate access token from private key pem error: %w", err)
+		return "", fmt.Errorf("generate access token from private key error: %w", err)
 	}
 
 	return jwtString, nil
 }
 
 func (m *JWTManager) Verify(accessToken string) (*UserClaims, error) {
-	publicKey, err := ParseEd25519PublicKey(m.publicPemKeyPath)
-	if err != nil {
-		return nil, fmt.Errorf("read ed25519 private key error: %w", err)
-	}
-
 	token, err := jwt.ParseWithClaims(
 		accessToken,
 		&UserClaims{},
@@ -70,7 +66,7 @@ func (m *JWTManager) Verify(accessToken string) (*UserClaims, error) {
 				return nil, fmt.Errorf("unexpected token signing method")
 			}
 
-			return publicKey, nil
+			return m.publicKey, nil
 		},
 	)
 

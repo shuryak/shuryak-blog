@@ -10,3 +10,7 @@ logger:
 
 postgres:
   pool_max: 2
+
+certs:
+  private_key_pem_path: "/etc/ssl/certs/ed25519key.pem"
+  public_key_pem_path: "/etc/ssl/certs/ed25519key.pem.pub"
