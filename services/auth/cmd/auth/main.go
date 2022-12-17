@@ -47,7 +47,7 @@ func main() {
 	uss := internal.NewPostgresUserSessionStore(pg)
 	sm := internal.NewSessionManager(uss, 64, 7*24*time.Hour)
 
-	jwt := internal.NewJWTManager("super-secret", 10*time.Minute)
+	jwt := internal.NewJWTManager("cert/ed25519key.pem", "cert/ed25519key.pem.pub", 10*time.Minute)
 	list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 
 	s := grpc.NewServer()
