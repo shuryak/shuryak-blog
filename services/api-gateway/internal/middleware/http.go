@@ -1,22 +1,19 @@
-package auth
+package middleware
 
 import (
-	"api-gateway/internal/auth/pb"
 	"api-gateway/internal/errors"
 	"api-gateway/pkg/logger"
-	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 )
 
 type Middleware struct {
-	c pb.AuthClient
 	l logger.Interface
 }
 
-func NewMiddleware(c pb.AuthClient, l logger.Interface) Middleware {
-	return Middleware{c, l}
+func NewMiddleware(l logger.Interface) Middleware {
+	return Middleware{l}
 }
 
 func (m *Middleware) AuthRequired(ctx *gin.Context) {
@@ -33,17 +30,7 @@ func (m *Middleware) AuthRequired(ctx *gin.Context) {
 		return
 	}
 
-	res, err := m.c.Validate(context.Background(), &pb.ValidateRequest{
-		AccessToken: token[1],
-	})
-	if err != nil {
-		m.l.Error(err, "auth - middleware - AuthRequired")
-		errors.ErrorResponse(ctx, http.StatusUnauthorized, "invalid token")
-		return
-	}
-
-	ctx.Set("username", res.Username)
-	ctx.Set("user_id", res.UserId)
+	ctx.Set("access_token", token[1])
 
 	ctx.Next()
 }
