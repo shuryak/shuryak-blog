@@ -3,20 +3,15 @@ package articles
 import (
 	"api-gateway/config"
 	"api-gateway/internal/articles/routes"
-	"api-gateway/internal/auth"
+	"api-gateway/internal/middleware"
 	"api-gateway/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(engine *gin.Engine, cfg *config.Config, l logger.Interface) {
-	authClient, err := auth.NewServiceClient(cfg)
-	if err != nil {
-		l.Error(err, "internal - articles - RegisterRoutes")
-	}
+	a := middleware.NewHTTPAuthMiddleware(l)
 
-	a := auth.NewMiddleware(authClient, l)
-
-	articlesClient, err := NewServiceClient(cfg)
+	articlesClient, err := NewServiceClient(cfg, l)
 	if err != nil {
 		l.Error(err, "internal - articles - RegisterRoutes")
 	}

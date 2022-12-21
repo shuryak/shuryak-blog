@@ -4,7 +4,6 @@ import (
 	"api-gateway/internal/articles/pb"
 	"api-gateway/internal/dto"
 	"api-gateway/internal/errors"
-	"context"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/structpb"
 	"net/http"
@@ -43,11 +42,8 @@ func (r *Routes) Create(ctx *gin.Context) {
 		errors.ErrorResponse(ctx, http.StatusInternalServerError, "some problems")
 	}
 
-	authorId, _ := ctx.Get("user_id")
-
-	article, err := r.c.Create(context.Background(), &pb.CreateRequest{
+	article, err := r.c.Create(ctx, &pb.CreateRequest{
 		CustomId:  req.CustomId,
-		AuthorId:  authorId.(uint32),
 		Title:     req.Title,
 		Thumbnail: req.Thumbnail,
 		Content:   content,

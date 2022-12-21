@@ -4,6 +4,7 @@ import (
 	"auth/internal"
 	"auth/internal/delivery/grpc/auth_grpc"
 	"auth/internal/entity"
+	"auth/pkg/jwt"
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -16,12 +17,12 @@ var _ auth_grpc.AuthServer = (*AuthGRPCServer)(nil)
 
 type AuthGRPCServer struct {
 	userStore      internal.UserStore
-	jwtManager     *internal.JWTManager
+	jwtManager     *jwt.Manager
 	sessionManager *internal.SessionManager
 	auth_grpc.UnimplementedAuthServer
 }
 
-func NewAuthGRPCServer(s *grpc.Server, us internal.UserStore, jm *internal.JWTManager, sm *internal.SessionManager) {
+func NewAuthGRPCServer(s *grpc.Server, us internal.UserStore, jm *jwt.Manager, sm *internal.SessionManager) {
 	as := &AuthGRPCServer{
 		userStore:      us,
 		jwtManager:     jm,
@@ -83,7 +84,7 @@ func (s AuthGRPCServer) Validate(ctx context.Context, req *auth_grpc.ValidateReq
 	*auth_grpc.ValidateResponse,
 	error,
 ) {
-	claims, err := s.jwtManager.Verify(req.GetAccessToken())
+	claims, err := s.jwtManager.Decode(req.GetAccessToken())
 
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "access token is bad")

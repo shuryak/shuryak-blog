@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-type Middleware struct {
+type HTTPAuthMiddleware struct {
 	l logger.Interface
 }
 
-func NewMiddleware(l logger.Interface) Middleware {
-	return Middleware{l}
+func NewHTTPAuthMiddleware(l logger.Interface) HTTPAuthMiddleware {
+	return HTTPAuthMiddleware{l}
 }
 
-func (m *Middleware) AuthRequired(ctx *gin.Context) {
+func (m *HTTPAuthMiddleware) AuthRequired(ctx *gin.Context) {
 	authorization := ctx.Request.Header.Get("authorization")
 	if authorization == "" {
 		errors.ErrorResponse(ctx, http.StatusUnauthorized, "no parameters for authorization")

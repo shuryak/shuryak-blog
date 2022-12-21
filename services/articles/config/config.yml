@@ -13,3 +13,6 @@ logger:
 
 postgres:
   pool_max: 2
+
+certs:
+  public_key_pem_path: "/etc/ssl/certs/ed25519key.pem.pub"

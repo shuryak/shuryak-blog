@@ -4,7 +4,6 @@ import (
 	"api-gateway/internal/articles/pb"
 	"api-gateway/internal/dto"
 	"api-gateway/internal/errors"
-	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -27,7 +26,7 @@ func (r *Routes) Delete(ctx *gin.Context) {
 		return
 	}
 
-	article, err := r.c.Delete(context.Background(), &pb.ArticleIdRequest{
+	article, err := r.c.Delete(ctx, &pb.ArticleIdRequest{
 		Id: req.Id,
 	})
 	if err != nil {

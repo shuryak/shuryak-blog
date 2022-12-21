@@ -1,4 +1,4 @@
-package internal
+package jwt
 
 import (
 	"auth/internal/entity"
@@ -8,10 +8,20 @@ import (
 	"time"
 )
 
-type JWTManager struct {
+// TODO: this is fine?
+
+type Validator struct {
+	publicKey crypto.PublicKey
+}
+
+type Issuer struct {
 	privateKey    crypto.PrivateKey
-	publicKey     crypto.PublicKey
 	tokenDuration time.Duration
+}
+
+type Manager struct {
+	Validator
+	Issuer
 }
 
 type UserClaims struct {
@@ -21,21 +31,42 @@ type UserClaims struct {
 	Role     string `json:"role"`
 }
 
-func NewJWTManager(privateKeyPEMPath, publicKeyPEMPath string, tokenDuration time.Duration) (*JWTManager, error) {
-	privateKey, err := ParseEd25519PrivateKey(privateKeyPEMPath)
-	if err != nil {
-		return nil, fmt.Errorf("read ed25519 private key error: %w", err)
-	}
-
+func NewValidator(publicKeyPEMPath string) (*Validator, error) {
 	publicKey, err := ParseEd25519PublicKey(publicKeyPEMPath)
 	if err != nil {
 		return nil, fmt.Errorf("read ed25519 public key error: %w", err)
 	}
 
-	return &JWTManager{privateKey, publicKey, tokenDuration}, nil
+	return &Validator{publicKey}, nil
 }
 
-func (m *JWTManager) Generate(user *entity.User) (string, error) {
+func NewIssuer(privateKeyPEMPath string, tokenDuration time.Duration) (*Issuer, error) {
+	privateKey, err := ParseEd25519PrivateKey(privateKeyPEMPath)
+	if err != nil {
+		return nil, fmt.Errorf("read ed25519 private key error: %w", err)
+	}
+
+	return &Issuer{
+		privateKey,
+		tokenDuration,
+	}, nil
+}
+
+func NewManager(privateKeyPEMPath, publicKeyPEMPath string, tokenDuration time.Duration) (*Manager, error) {
+	issuer, err := NewIssuer(privateKeyPEMPath, tokenDuration)
+	if err != nil {
+		return nil, fmt.Errorf("private key error: %w", err)
+	}
+
+	validator, err := NewValidator(publicKeyPEMPath)
+	if err != nil {
+		return nil, fmt.Errorf("public key error: %w", err)
+	}
+
+	return &Manager{*validator, *issuer}, nil
+}
+
+func (m *Issuer) Generate(user *entity.User) (string, error) {
 	claims := UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "auth",
@@ -56,7 +87,7 @@ func (m *JWTManager) Generate(user *entity.User) (string, error) {
 	return jwtString, nil
 }
 
-func (m *JWTManager) Verify(accessToken string) (*UserClaims, error) {
+func (m *Validator) Decode(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
 		&UserClaims{},

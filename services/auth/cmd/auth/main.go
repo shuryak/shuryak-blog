@@ -5,6 +5,7 @@ import (
 	"auth/internal"
 	grpccontroller "auth/internal/delivery/grpc"
 	"auth/internal/entity"
+	"auth/pkg/jwt"
 	"auth/pkg/logger"
 	"auth/pkg/postgres"
 	"context"
@@ -47,7 +48,7 @@ func main() {
 	uss := internal.NewPostgresUserSessionStore(pg)
 	sm := internal.NewSessionManager(uss, 64, 7*24*time.Hour)
 
-	jwt, err := internal.NewJWTManager(cfg.Certs.PrivateKeyPEMPath, cfg.Certs.PublicKeyPEMPath, 10*time.Minute)
+	jwtMan, err := jwt.NewManager(cfg.Certs.PrivateKeyPEMPath, cfg.Certs.PublicKeyPEMPath, 10*time.Minute)
 	if err != nil {
 		log.Fatalf("Certs error: %v", err)
 	}
@@ -55,7 +56,7 @@ func main() {
 	list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 
 	s := grpc.NewServer()
-	grpccontroller.NewAuthGRPCServer(s, us, jwt, sm)
+	grpccontroller.NewAuthGRPCServer(s, us, jwtMan, sm)
 
 	if err != nil {
 		l.Fatal("listen fatal error")

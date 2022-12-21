@@ -7,11 +7,12 @@ import (
 
 type (
 	Config struct {
-		App  `yaml:"app"`
-		GRPC `yaml:"grpc"`
-		HTTP `yaml:"http"`
-		Log  `yaml:"logger"`
-		PG   `yaml:"postgres"`
+		App   `yaml:"app"`
+		GRPC  `yaml:"grpc"`
+		HTTP  `yaml:"http"`
+		Log   `yaml:"logger"`
+		PG    `yaml:"postgres"`
+		Certs `yaml:"certs"`
 	}
 
 	App struct {
@@ -34,6 +35,10 @@ type (
 	PG struct {
 		PoolMax int    `yaml:"pool_max" env:"PG_POOL_MAX"`
 		URL     string `env:"PG_URL"`
+	}
+
+	Certs struct {
+		PublicKeyPEMPath string `yaml:"public_key_pem_path" env:"PUBLIC_KEY_PEM_PATH"`
 	}
 )
 

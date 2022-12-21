@@ -8,15 +8,15 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type AuthInterceptor struct {
+type GRPCAuthMiddleware struct {
 	l logger.Interface
 }
 
-func NewAuthInterceptor(l logger.Interface) *AuthInterceptor {
-	return &AuthInterceptor{l}
+func NewGRPCAuthMiddleware(l logger.Interface) *GRPCAuthMiddleware {
+	return &GRPCAuthMiddleware{l}
 }
 
-func (i *AuthInterceptor) UnaryClientInterceptor() grpc.UnaryClientInterceptor {
+func (i *GRPCAuthMiddleware) UnaryClientInterceptor() grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		i.l.Info("--> unary interceptor: ", method)
 
@@ -29,13 +29,13 @@ func (i *AuthInterceptor) UnaryClientInterceptor() grpc.UnaryClientInterceptor {
 			"access_token": token,
 		}))
 
-		// TODO: i don't know if there is logic in creating a new context
+		// TODO: I don't know if there is logic in creating a new context
 
 		return invoker(newCtx, method, req, reply, cc, opts...)
 	}
 }
 
-func (i *AuthInterceptor) StreamClientInterceptor() grpc.StreamClientInterceptor {
+func (i *GRPCAuthMiddleware) StreamClientInterceptor() grpc.StreamClientInterceptor {
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		i.l.Info("--> stream interceptor: ", method)
 
@@ -47,7 +47,6 @@ func (i *AuthInterceptor) StreamClientInterceptor() grpc.StreamClientInterceptor
 		newCtx := metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
 			"access_token": token,
 		}))
-
 
 		return streamer(newCtx, desc, cc, method, opts...)
 	}

@@ -4,7 +4,6 @@ import (
 	"api-gateway/internal/articles/pb"
 	"api-gateway/internal/dto"
 	"api-gateway/internal/errors"
-	"context"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/structpb"
 	"net/http"
@@ -44,12 +43,9 @@ func (r *Routes) Update(ctx *gin.Context) {
 		errors.ErrorResponse(ctx, http.StatusInternalServerError, "some problems")
 	}
 
-	authorId, _ := ctx.Get("user_id")
-
-	article, err := r.c.Update(context.Background(), &pb.UpdateRequest{
+	article, err := r.c.Update(ctx, &pb.UpdateRequest{
 		Id:        req.Id,
 		CustomId:  req.CustomId,
-		AuthorId:  authorId.(uint32),
 		Title:     req.Title,
 		Thumbnail: req.Thumbnail,
 		Content:   content,

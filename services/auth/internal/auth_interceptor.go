@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"auth/pkg/jwt"
 	"auth/pkg/logger"
 	"context"
 	"google.golang.org/grpc"
@@ -10,13 +11,13 @@ import (
 )
 
 type AuthInterceptor struct {
-	jwtManager      *JWTManager
+	jwtManager      *jwt.Manager
 	accessibleRoles map[string][]string
 	logger          logger.Interface
 }
 
 func NewAuthInterceptor(
-	jwtManager *JWTManager,
+	jwtManager *jwt.Manager,
 	accessibleRoles map[string][]string,
 	logger logger.Interface,
 ) *AuthInterceptor {
@@ -54,7 +55,7 @@ func (interceptor *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 		if err != nil {
 			return err
 		}
-		
+
 		return handler(srv, stream)
 	}
 }
@@ -77,7 +78,7 @@ func (interceptor *AuthInterceptor) authorize(ctx context.Context, method string
 	}
 
 	accessToken := values[0]
-	claims, err := interceptor.jwtManager.Verify(accessToken)
+	claims, err := interceptor.jwtManager.Decode(accessToken)
 	if err != nil {
 		return status.Errorf(codes.Unauthenticated, "access token is invalid: %v", err)
 	}

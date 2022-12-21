@@ -15,10 +15,13 @@ evans:
 	evans internal/delivery/grpc/auth.proto -p 50052
 .PHONY: evans
 
+# TODO: Secrets manager
 certs:
 	mkdir -p certs
+	mkdir -p ../articles/certs
 	openssl genpkey -algorithm Ed25519 -out certs/ed25519key.pem
 	openssl pkey -in certs/ed25519key.pem -pubout -out certs/ed25519key.pem.pub
+	cp certs/ed25519key.pem.pub ../articles/certs/
 .PHONY: certs
 
 remove-certs:
