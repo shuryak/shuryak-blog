@@ -3,14 +3,18 @@ package grpc
 import (
 	"context"
 	"fmt"
-	articles_grpc "github.com/shuryak/shuryak-blog/internal/controller/grpc/articles_grpc"
+	"github.com/shuryak/shuryak-blog/internal/controller/grpc/articles_grpc"
 	"github.com/shuryak/shuryak-blog/internal/entity"
 	"github.com/shuryak/shuryak-blog/internal/usecase"
 	"github.com/shuryak/shuryak-blog/pkg/logger"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
-	"time"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"strconv"
 )
 
 // Check for implementation
@@ -22,10 +26,47 @@ type articlesGRPCServer struct {
 	articles_grpc.UnimplementedArticlesServer
 }
 
+type Metadata struct {
+	UserId   uint32
+	Username string
+	Role     string
+}
+
+func (g articlesGRPCServer) extractMetadata(ctx context.Context) (*Metadata, error) {
+	var mtdt Metadata
+
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if userId := md.Get("user_id"); len(userId) > 0 {
+			u64, err := strconv.ParseUint(userId[0], 10, 32)
+			if err != nil {
+				return nil, fmt.Errorf("cannot read user id: %w", err)
+			}
+			mtdt.UserId = uint32(u64)
+		} else {
+			return nil, fmt.Errorf("no user id")
+		}
+
+		if username := md.Get("username"); len(username) > 0 {
+			mtdt.Username = username[0]
+		} else {
+			return nil, fmt.Errorf("no username")
+		}
+
+		if role := md.Get("role"); len(role) > 0 {
+			mtdt.Role = role[0]
+		} else {
+			return nil, fmt.Errorf("no role")
+		}
+	}
+
+	return &mtdt, nil
+}
+
 func NewArticlesGrpcServer(server *grpc.Server, a usecase.Article, l logger.Interface) {
 	ags := &articlesGRPCServer{
 		a: a,
-		l: l}
+		l: l,
+	}
 	articles_grpc.RegisterArticlesServer(server, ags)
 	reflection.Register(server)
 }
@@ -34,9 +75,15 @@ func (g articlesGRPCServer) Create(ctx context.Context, request *articles_grpc.C
 	*articles_grpc.SingleArticleResponse,
 	error,
 ) {
-	article, err := g.a.Create(ctx, entity.Article{ // TODO: context things
+	mtdt, err := g.extractMetadata(ctx)
+	if err != nil {
+		g.l.Error(err, "grpc - extractMetadata: %w", err)
+		return nil, status.Error(codes.Unauthenticated, "authorization error")
+	}
+
+	article, err := g.a.Create(ctx, entity.Article{
 		CustomId:  request.CustomId,
-		AuthorId:  uint(request.AuthorId),
+		AuthorId:  mtdt.UserId,
 		Title:     request.Title,
 		Thumbnail: request.Thumbnail,
 		Content:   request.Content.AsMap(),
@@ -53,12 +100,13 @@ func (g articlesGRPCServer) Create(ctx context.Context, request *articles_grpc.C
 	}
 
 	sar := articles_grpc.SingleArticleResponse{
-		Id:        uint32(article.Id),
+		Id:        article.Id,
 		CustomId:  article.CustomId,
-		AuthorId:  uint32(article.AuthorId),
+		AuthorId:  article.AuthorId,
 		Title:     article.Title,
 		Thumbnail: article.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(article.CreatedAt),
 	}
 
 	return &sar, nil
@@ -68,7 +116,7 @@ func (g articlesGRPCServer) GetById(ctx context.Context, request *articles_grpc.
 	*articles_grpc.SingleArticleResponse,
 	error,
 ) {
-	a, err := g.a.GetById(ctx, uint(request.Id)) // TODO: context things
+	a, err := g.a.GetById(ctx, uint(request.Id))
 	if err != nil {
 		g.l.Error(err, "grpc - GetById")
 		return nil, fmt.Errorf("grpc - GetById - g.a.GetById: %w", err) // TODO: do errors?
@@ -81,12 +129,13 @@ func (g articlesGRPCServer) GetById(ctx context.Context, request *articles_grpc.
 	}
 
 	sar := articles_grpc.SingleArticleResponse{
-		Id:        uint32(a.Id),
+		Id:        a.Id,
 		CustomId:  a.CustomId,
-		AuthorId:  uint32(a.AuthorId),
+		AuthorId:  a.AuthorId,
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(a.CreatedAt),
 	}
 
 	return &sar, nil
@@ -96,7 +145,7 @@ func (g articlesGRPCServer) GetMany(ctx context.Context, request *articles_grpc.
 	*articles_grpc.MultipleArticlesResponse,
 	error,
 ) {
-	articles, err := g.a.GetMany(ctx, uint(request.Offset), uint(request.Count)) // TODO: context things
+	articles, err := g.a.GetMany(ctx, uint(request.Offset), uint(request.Count))
 	if err != nil {
 		g.l.Error(err, "grpc - GetMany")
 		return nil, fmt.Errorf("grpc - GetMany - g.a.GetMany: %w", err) // TODO: do errors?
@@ -111,12 +160,13 @@ func (g articlesGRPCServer) GetMany(ctx context.Context, request *articles_grpc.
 		}
 
 		sarSlice[i] = &articles_grpc.SingleArticleResponse{
-			Id:        uint32(a.Id),
+			Id:        a.Id,
 			CustomId:  a.CustomId,
-			AuthorId:  uint32(a.AuthorId),
+			AuthorId:  a.AuthorId,
 			Title:     a.Title,
 			Thumbnail: a.Thumbnail,
 			Content:   content,
+			CreatedAt: timestamppb.New(a.CreatedAt),
 		}
 	}
 
@@ -127,14 +177,19 @@ func (g articlesGRPCServer) Update(ctx context.Context, request *articles_grpc.U
 	*articles_grpc.SingleArticleResponse,
 	error,
 ) {
-	a, err := g.a.Update(ctx, entity.Article{ // TODO: context things
-		Id:        uint(request.Id),
+	mtdt, err := g.extractMetadata(ctx)
+	if err != nil {
+		g.l.Error(err, "grpc - extractMetadata: %w", err)
+		return nil, status.Error(codes.Unauthenticated, "authorization error")
+	}
+
+	a, err := g.a.Update(ctx, entity.Article{
+		Id:        request.Id,
 		CustomId:  request.CustomId,
-		AuthorId:  uint(request.AuthorId),
+		AuthorId:  mtdt.UserId,
 		Title:     request.Title,
 		Thumbnail: request.Thumbnail,
 		Content:   request.Content.AsMap(),
-		CreatedAt: time.Time{},
 	})
 	if err != nil {
 		g.l.Error(err, "grpc - Update")
@@ -148,12 +203,13 @@ func (g articlesGRPCServer) Update(ctx context.Context, request *articles_grpc.U
 	}
 
 	sar := articles_grpc.SingleArticleResponse{
-		Id:        uint32(a.Id),
+		Id:        a.Id,
 		CustomId:  a.CustomId,
-		AuthorId:  uint32(a.AuthorId),
+		AuthorId:  a.AuthorId,
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(a.CreatedAt),
 	}
 
 	return &sar, nil
@@ -163,7 +219,9 @@ func (g articlesGRPCServer) Delete(ctx context.Context, request *articles_grpc.A
 	*articles_grpc.SingleArticleResponse,
 	error,
 ) {
-	a, err := g.a.Delete(ctx, uint(request.Id)) // TODO: context things
+	// TODO: authorize
+
+	a, err := g.a.Delete(ctx, uint(request.Id))
 	if err != nil {
 		g.l.Error(err, "grpc - Delete")
 		return nil, fmt.Errorf("grpc - Delete - g.a.Delete: %w", err) // TODO: do errors?
@@ -176,12 +234,13 @@ func (g articlesGRPCServer) Delete(ctx context.Context, request *articles_grpc.A
 	}
 
 	sar := articles_grpc.SingleArticleResponse{
-		Id:        uint32(a.Id),
+		Id:        a.Id,
 		CustomId:  a.CustomId,
-		AuthorId:  uint32(a.AuthorId),
+		AuthorId:  a.AuthorId,
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   content,
+		CreatedAt: timestamppb.New(a.CreatedAt),
 	}
 
 	return &sar, nil

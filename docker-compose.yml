@@ -1,0 +1,106 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    build: services/api-gateway/.
+    image: api-gateway-service
+    container_name: api-gateway-service
+    networks:
+      - services-network
+    environment:
+      HTTP_PORT: 8080
+      AUTH_SVC_URL: auth:50052
+      ARTICLES_SVC_URL: articles:50051
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth
+      - articles
+  articles:
+    build: services/articles/.
+    image: articles-service
+    container_name: articles-service
+    env_file:
+      - .env
+    networks:
+      - articles-db-network
+      - services-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DB: $DB
+      PG_URL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@articles-postgres:5432/$DB?sslmode=disable
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+    depends_on:
+      - articles-postgres
+  auth:
+    build: services/auth/.
+    image: auth-service
+    container_name: auth-service
+    env_file:
+      - .env
+    networks:
+      - auth-db-network
+      - services-network
+    environment:
+      PG_URL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@auth-postgres:5432/$DB?sslmode=disable
+    ports:
+      - "50052:50052"
+    depends_on:
+      - auth-postgres
+  articles-postgres:
+    image: postgres:14.5-alpine3.16
+    container_name: articles-postgres
+    env_file:
+      - .env
+    networks:
+      - articles-db-network
+    volumes:
+      - articles-pg-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  auth-postgres:
+    image: postgres:14.5-alpine3.16
+    container_name: auth-postgres
+    env_file:
+      - .env
+    networks:
+      - auth-db-network
+    volumes:
+      - auth-pg-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+  articles-db-migrations:
+    image: migrate/migrate
+    container_name: articles-db-migrations
+    env_file:
+      - .env
+    networks:
+      - articles-db-network
+    volumes:
+      - ./services/articles/migrations:/migrations
+    depends_on:
+      - articles-postgres
+    command: -path=/migrations -database postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@articles-postgres:5432/$DB?sslmode=disable up
+  auth-db-migrations:
+    image: migrate/migrate
+    container_name: auth-db-migrations
+    env_file:
+      - .env
+    networks:
+      - auth-db-network
+    volumes:
+      - ./services/auth/migrations:/migrations
+    depends_on:
+      - auth-postgres
+    command: -path=/migrations -database postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@auth-postgres:5432/$DB?sslmode=disable up
+
+volumes:
+  articles-pg-data:
+  auth-pg-data:
+networks:
+  articles-db-network:
+  auth-db-network:
+  services-network:

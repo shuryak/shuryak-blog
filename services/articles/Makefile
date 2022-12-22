@@ -1,4 +1,4 @@
-include .env
+include ../../.env
 export
 PG_URL := postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${DB}?sslmode=disable
 export PG_URL
@@ -16,7 +16,8 @@ swagger:
 .PHONY: swagger
 
 protoc:
-	protoc internal/controller/grpc/articles.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/
+	protoc internal/controller/grpc/articles.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/ && \
+	protoc internal/controller/grpc/auth.proto --go-grpc_out=internal/controller/grpc/ --go_out=internal/controller/grpc/
 .PHONY: protoc
 
 evans:

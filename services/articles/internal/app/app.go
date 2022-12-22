@@ -7,10 +7,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/shuryak/shuryak-blog/config"
 	grpccontroller "github.com/shuryak/shuryak-blog/internal/controller/grpc"
+	"github.com/shuryak/shuryak-blog/internal/controller/grpc/middleware"
 	v1 "github.com/shuryak/shuryak-blog/internal/controller/http/v1"
 	"github.com/shuryak/shuryak-blog/internal/usecase"
 	"github.com/shuryak/shuryak-blog/internal/usecase/repo"
 	"github.com/shuryak/shuryak-blog/pkg/httpserver"
+	"github.com/shuryak/shuryak-blog/pkg/jwt"
 	"github.com/shuryak/shuryak-blog/pkg/logger"
 	"github.com/shuryak/shuryak-blog/pkg/postgres"
 	"google.golang.org/grpc"
@@ -53,9 +55,21 @@ func Run(cfg *config.Config) {
 		list, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 		if err != nil {
 			l.Fatal(fmt.Errorf("app - Run - net.Listen: %w", err))
+			return
 		}
 
-		s := grpc.NewServer() // TODO: to pkg
+		v, err := jwt.NewValidator(cfg.PublicKeyPEMPath)
+		if err != nil {
+			l.Fatal(fmt.Errorf("app - Run - jwt.NewValidator: %w", err))
+			return
+		}
+
+		authMiddleware := middleware.NewAuthMiddleware(*v, l)
+
+		s := grpc.NewServer(
+			grpc.UnaryInterceptor(authMiddleware.UnaryServerInterceptor()),
+			grpc.StreamInterceptor(authMiddleware.StreamServerInterceptor()),
+		) // TODO: to pkg
 		grpccontroller.NewArticlesGrpcServer(s, articlesUseCase, l)
 		err = s.Serve(list)
 		if err != nil {
