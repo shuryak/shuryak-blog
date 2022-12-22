@@ -1,0 +1,324 @@
+definitions:
+  dto.ManyArticlesResponse:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/dto.SingleArticleResponse'
+        type: array
+    type: object
+  dto.SingleArticleResponse:
+    properties:
+      author_id:
+        example: 42
+        type: integer
+      content:
+        additionalProperties: true
+        type: object
+      created_at:
+        example: "2022-10-07T14:26:06.510465Z"
+        type: string
+      custom_id:
+        example: article-url
+        type: string
+      id:
+        example: 1000
+        type: integer
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        type: string
+    type: object
+  errors.Response:
+    properties:
+      error: {}
+    type: object
+  pb.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  pb.RegisterResponse:
+    properties:
+      id:
+        type: integer
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  routes.CreateRequest:
+    properties:
+      content:
+        additionalProperties: true
+        type: object
+      custom_id:
+        example: article-url
+        maxLength: 20
+        minLength: 3
+        type: string
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        maxLength: 150
+        minLength: 5
+        type: string
+    required:
+    - content
+    - custom_id
+    - thumbnail
+    - title
+    type: object
+  routes.UpdateRequest:
+    properties:
+      content:
+        additionalProperties: true
+        type: object
+      custom_id:
+        example: article-url
+        maxLength: 20
+        minLength: 3
+        type: string
+      id:
+        example: 1000
+        minimum: 1
+        type: integer
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        maxLength: 150
+        minLength: 5
+        type: string
+    required:
+    - content
+    - custom_id
+    - id
+    - thumbnail
+    - title
+    type: object
+info:
+  contact: {}
+paths:
+  /articles/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates an article
+      parameters:
+      - description: article to create
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/routes.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
+      summary: Creates an article
+  /articles/delete:
+    delete:
+      description: Deletes article by ID
+      parameters:
+      - description: ID to delete
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
+      summary: Deletes article by ID
+  /articles/getById:
+    get:
+      description: Gets article by ID
+      parameters:
+      - description: ID to get
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      summary: Gets article by ID
+  /articles/getMany:
+    get:
+      description: Gets collection of articles
+      parameters:
+      - description: offset to get
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: count to get
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ManyArticlesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      summary: Gets collection of articles
+  /articles/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates article by ID
+      parameters:
+      - description: article to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/routes.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
+      summary: Updates article by ID
+  /auth/login:
+    get:
+      description: Gets access and refresh tokens
+      parameters:
+      - description: Username
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: User password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pb.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      summary: Method to login
+  /auth/register:
+    get:
+      description: User registration
+      parameters:
+      - description: Username
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: User password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pb.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.Response'
+      summary: Method to register
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

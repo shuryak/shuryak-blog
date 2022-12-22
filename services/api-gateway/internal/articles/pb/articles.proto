@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package articlesGrpc;
+option go_package = "./pb";
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+service Articles {
+  rpc Create(CreateRequest) returns (SingleArticleResponse);
+  rpc GetById(ArticleIdRequest) returns (SingleArticleResponse);
+  rpc GetMany(GetManyRequest) returns (MultipleArticlesResponse);
+  rpc Update(UpdateRequest) returns (SingleArticleResponse);
+  rpc Delete(ArticleIdRequest) returns (SingleArticleResponse);
+}
+
+message CreateRequest {
+  string customId = 1;
+  string title = 2;
+  string thumbnail = 3;
+  google.protobuf.Struct content = 4;
+}
+
+message SingleArticleResponse {
+  uint32 id = 1;
+  string customId = 2;
+  uint32 authorId = 3;
+  string title = 4;
+  string thumbnail = 5;
+  google.protobuf.Struct content = 6;
+  google.protobuf.Timestamp createdAt = 7;
+}
+
+message ArticleIdRequest {
+  uint32 id = 1;
+}
+
+message GetManyRequest {
+  uint32 offset = 1;
+  uint32 count = 2;
+}
+
+message MultipleArticlesResponse {
+  repeated SingleArticleResponse articles = 1;
+}
+
+message UpdateRequest {
+  uint32 id = 1;
+  string customId = 2;
+  string title = 3;
+  string thumbnail = 4;
+  google.protobuf.Struct content = 5;
+}
