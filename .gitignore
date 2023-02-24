@@ -10,5 +10,3 @@ go.work
 /Godeps/
 .idea
 .vscode
-
-certs/

@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "./proto/user;user";
+
+import "google/protobuf/timestamp.proto";
+
+service User {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (TokenPairResponse);
+  rpc RefreshSession(RefreshSessionRequest) returns (TokenPairResponse);
+  rpc Validate(ValidateRequest) returns (ValidateResponse);
+}
+
+message RegisterRequest {
+  string username = 1;
+  string role = 2;
+  string plain_password = 3;
+}
+
+message RegisterResponse {
+  uint32 id = 1;
+  string username = 2;
+  string role = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message LoginRequest {
+  string username = 1;
+  string plain_password = 2;
+}
+
+message TokenPairResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshSessionRequest {
+  string username = 1;
+  string refresh_token = 2;
+}
+
+message ValidateRequest {
+  string access_token = 1;
+}
+
+message ValidateResponse {
+  uint32 user_id = 1;
+  string username = 2;
+  bool is_valid = 3;
+}

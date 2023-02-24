@@ -1,0 +1,12 @@
+service:
+  name: 'articles'
+  version: '1.0.0'
+
+gateways:
+  user_service_name: 'user'
+
+logger:
+  level: 'debug'
+
+postgres:
+  pool_max: 2

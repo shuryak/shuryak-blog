@@ -1,5 +1,0 @@
-# Auth service
-
-## Users ERD
-
-

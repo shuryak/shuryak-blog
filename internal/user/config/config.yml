@@ -1,0 +1,9 @@
+service:
+  name: 'user'
+  version: '1.0.0'
+
+logger:
+  level: 'debug'
+
+postgres:
+  pool_max: 2
