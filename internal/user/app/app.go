@@ -36,7 +36,9 @@ func Run(cfg *config.Config) {
 	srv.Init()
 
 	// Register handler
-	err = pb.RegisterUserHandler(srv.Server(), h)
+	if err := pb.RegisterUserHandler(srv.Server(), h); err != nil {
+		l.Fatal(err)
+	}
 
 	// Run service
 	if err := srv.Run(); err != nil {
