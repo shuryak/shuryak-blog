@@ -1,0 +1,11 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-env
+data:
+  MICRO_REGISTRY: kubernetes
+  SERVER_ADDRESS: :8082
+  SERVER_AUTH_USERNAME: user
+  SERVER_AUTH_PASSWORD: pass

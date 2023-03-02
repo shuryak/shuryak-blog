@@ -1,0 +1,27 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: articles
+  labels:
+    app: articles
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: articles
+  template:
+    metadata:
+      labels:
+        app: articles
+    spec:
+      containers:
+        - name: articles
+          securityContext:
+            allowPrivilegeEscalation: false
+          image: articles-server:latest
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: articles-env

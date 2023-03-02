@@ -2,6 +2,9 @@ package app
 
 import (
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/shuryak/shuryak-blog/internal/articles/config"
 	"github.com/shuryak/shuryak-blog/internal/articles/handlers"
 	"github.com/shuryak/shuryak-blog/internal/articles/middleware"
@@ -15,6 +18,15 @@ import (
 
 func Run(cfg *config.Config) {
 	l := logger.New(cfg.Logger.Level)
+
+	// Migrations
+	m, err := migrate.New("file://../migrations", cfg.PG.URL)
+	if err != nil {
+		l.Fatal(fmt.Errorf("app - Run - migrate.New: %w", err))
+	}
+	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
+		l.Fatal(fmt.Errorf("app - Run - m.Up: %w", err))
+	}
 
 	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
 	if err != nil {

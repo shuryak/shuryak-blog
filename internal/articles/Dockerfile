@@ -23,6 +23,7 @@ ENV SERVICE=articles
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /go/src/$SERVICE/$SERVICE /$SERVICE
 COPY --from=builder /go/src/$SERVICE/internal/$SERVICE/config/config.yml /
+COPY --from=builder /go/src/$SERVICE/internal/$SERVICE/migrations /migrations
 EXPOSE 50051
 ENTRYPOINT ["/articles"]
 CMD []
