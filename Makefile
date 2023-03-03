@@ -26,3 +26,25 @@ build-user:
 .PHONY: build-articles
 build-articles:
 	@go build -o articles cmd/articles/*.go
+
+.PHONY: user-image
+user-image:
+	docker build -f internal/user/Dockerfile -t user-server:latest .
+
+.PHONY: articles-image
+articles-image:
+	docker build -f internal/articles/Dockerfile -t articles-server:latest .
+
+.PHONY: apply
+apply:
+	kubectl apply -f k8s/
+	kubectl apply -f k8s/user/
+	kubectl apply -f k8s/articles/
+	kubectl apply -f k8s/dashboard/
+
+.PHONY: delete
+delete:
+	kubectl delete svc --all
+	kubectl delete deploy --all
+	kubectl delete pvc --all
+	kubectl delete pv --all

@@ -6,8 +6,6 @@ metadata:
   name: user-env
 data:
   MICRO_REGISTRY: kubernetes
-  SERVER_AUTH_USERNAME: user
-  SERVER_AUTH_PASSWORD: pass
   POSTGRES_USER: user
   POSTGRES_PASSWORD: supersecret
   DB: postgres

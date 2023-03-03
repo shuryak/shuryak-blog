@@ -6,7 +6,7 @@ metadata:
   name: articles-env
 data:
   MICRO_REGISTRY: kubernetes
-  POSTGRES: user
+  POSTGRES_USER: user
   POSTGRES_PASSWORD: supersecret
   DB: postgres
   PG_URL: postgres://user:supersecret@articles-postgres:5432/postgres?sslmode=disable
