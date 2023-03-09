@@ -2,6 +2,8 @@ package app
 
 import (
 	"fmt"
+	grpcc "github.com/go-micro/plugins/v4/client/grpc"
+	grpcs "github.com/go-micro/plugins/v4/server/grpc"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -36,11 +38,13 @@ func Run(cfg *config.Config) {
 
 	users := usecase.NewUsersUseCase(repo.NewUsersRepo(pg))
 	userSessions := usecase.NewUserSessionsUseCase(repo.NewUserSessionsRepo(pg), 64, 7*24*time.Hour) // TODO: config?
-	jwt := handlers.NewJWTManager("jwtsecret", 30*time.Minute)                                       // TODO: jwt is not handlers                                          // TODO: store secret
+	jwt := handlers.NewJWTManager("jwtsecret", 30*time.Minute)                                       // TODO: store secret
 
 	h := handlers.NewUsersHandler(users, userSessions, *jwt, cfg.Service.Name, l)
 
 	srv := micro.NewService(
+		micro.Server(grpcs.NewServer()),
+		micro.Client(grpcc.NewClient()),
 		micro.Name(cfg.Service.Name),
 		micro.Version(cfg.Service.Version),
 	)
@@ -49,6 +53,9 @@ func Run(cfg *config.Config) {
 
 	// Register handler
 	if err := pb.RegisterUserHandler(srv.Server(), h); err != nil {
+		l.Fatal(err)
+	}
+	if err := pb.RegisterHealthHandler(srv.Server(), new(handlers.HealthHandler)); err != nil {
 		l.Fatal(err)
 	}
 

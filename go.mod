@@ -5,7 +5,9 @@ go 1.20
 require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/go-micro/plugins/v4/broker/nats v1.2.0
+	github.com/go-micro/plugins/v4/client/grpc v1.2.0
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.1
+	github.com/go-micro/plugins/v4/server/grpc v1.2.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golang/protobuf v1.5.2
@@ -77,6 +79,8 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
+	google.golang.org/genproto v0.0.0-20220314164441-57ef72a4c106 // indirect
+	google.golang.org/grpc v1.45.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

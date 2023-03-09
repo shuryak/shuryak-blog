@@ -9,7 +9,9 @@ init:
 .PHONY: proto
 proto:
 	@protoc --proto_path=. --micro_out=. --go_out=:. proto/user/user.proto
+	@protoc --proto_path=. --micro_out=. --go_out=:. proto/user/health.proto
 	@protoc --proto_path=. --micro_out=. --go_out=:. proto/articles/articles.proto
+	@protoc --proto_path=. --micro_out=. --go_out=:. proto/articles/health.proto
 
 .PHONY: tidy
 tidy:
