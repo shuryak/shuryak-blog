@@ -8,10 +8,8 @@ init:
 
 .PHONY: proto
 proto:
-	@protoc --proto_path=. --micro_out=. --go_out=:. proto/user/user.proto
-	@protoc --proto_path=. --micro_out=. --go_out=:. proto/user/health.proto
-	@protoc --proto_path=. --micro_out=. --go_out=:. proto/articles/articles.proto
-	@protoc --proto_path=. --micro_out=. --go_out=:. proto/articles/health.proto
+	@protoc --proto_path=. --micro_out=. --go_out=:. proto/user/*.proto
+	@protoc --proto_path=. --micro_out=. --go_out=:. proto/articles/*.proto
 
 .PHONY: tidy
 tidy:
@@ -40,6 +38,7 @@ articles-image:
 .PHONY: apply
 apply:
 	kubectl apply -f k8s/
+	kubectl apply -f k8s/nats/
 	kubectl apply -f k8s/user/
 	kubectl apply -f k8s/articles/
 	kubectl apply -f k8s/dashboard/
@@ -50,3 +49,4 @@ delete:
 	kubectl delete deploy --all
 	kubectl delete pvc --all
 	kubectl delete pv --all
+	kubectl delete cm --all

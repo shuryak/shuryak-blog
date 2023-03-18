@@ -5,8 +5,11 @@ kind: ConfigMap
 metadata:
   name: articles-env
 data:
+  MICRO_SERVER_ADDRESS: :50052
   MICRO_REGISTRY: kubernetes
   POSTGRES_USER: user
   POSTGRES_PASSWORD: supersecret
   DB: postgres
   PG_URL: postgres://user:supersecret@articles-postgres:5433/postgres?sslmode=disable
+  MICRO_BROKER: nats
+  MICRO_BROKER_ADDRESS: ruser:T0pS3cr3t@nats

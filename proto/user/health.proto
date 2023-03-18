@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package health;
+package user;
 
 option go_package = "./proto/user;user";
 
 service Health {
-  rpc Check(HealthCheckRequest) returns (HealthCheckResponse) {}
-  rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse) {}
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
 }
 
 message HealthCheckRequest {

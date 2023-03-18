@@ -19,6 +19,11 @@ type Wrappers struct {
 
 func AuthWrapper(fn server.HandlerFunc) server.HandlerFunc {
 	return func(ctx context.Context, req server.Request, resp interface{}) error {
+		// Health checks
+		if req.Endpoint() == "Health.Check" || req.Endpoint() == "Health.Watch" {
+			return fn(ctx, req, resp)
+		}
+
 		meta, ok := metadata.FromContext(ctx)
 		if !ok {
 			return fmt.Errorf(handlers.GlobalErrors.AuthNoMetadata(req.Endpoint()))

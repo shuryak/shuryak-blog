@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   user-postgres:
-    image: postgres:14.5-alpine3.16
+    image: postgres:15.2-alpine3.17
     restart: always
     container_name: user-postgres
     env_file: .env
@@ -15,7 +15,7 @@ services:
       - "5432:5432"
 
   articles-postgres:
-    image: postgres:14.5-alpine3.16
+    image: postgres:15.2-alpine3.17
     restart: always
     container_name: articles-postgres
     env_file: .env

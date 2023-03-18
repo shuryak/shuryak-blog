@@ -16,6 +16,12 @@ spec:
       labels:
         app: articles
     spec:
+      initContainers:
+        - name: check-db-ready
+          image: postgres:15.2-alpine3.17
+          command: [ 'sh', '-c',
+            'until pg_isready -h articles-postgres -p 5433; 
+                do echo waiting for database; sleep 2; done;' ]
       containers:
         - name: articles
           securityContext:
@@ -25,3 +31,31 @@ spec:
           envFrom:
             - configMapRef:
                 name: articles-env
+          ports:
+            - containerPort: 50052
+          readinessProbe:
+            grpc:
+              port: 50052
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            grpc:
+              port: 50052
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: articles
+  labels:
+    app: articles
+spec:
+  type: NodePort
+  ports:
+    - port: 50052
+      targetPort: 50052
+      nodePort: 30031
+  selector:
+    app: articles

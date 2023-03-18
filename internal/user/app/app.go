@@ -37,8 +37,12 @@ func Run(cfg *config.Config) {
 	defer pg.Close()
 
 	users := usecase.NewUsersUseCase(repo.NewUsersRepo(pg))
-	userSessions := usecase.NewUserSessionsUseCase(repo.NewUserSessionsRepo(pg), 64, 7*24*time.Hour) // TODO: config?
-	jwt := handlers.NewJWTManager("jwtsecret", 30*time.Minute)                                       // TODO: store secret
+	userSessions := usecase.NewUserSessionsUseCase(
+		repo.NewUserSessionsRepo(pg),
+		64,
+		7*24*time.Hour,
+	) // TODO: from config
+	jwt := handlers.NewJWTManager("jwtsecret", 30*time.Minute) // TODO: store secret
 
 	h := handlers.NewUsersHandler(users, userSessions, *jwt, cfg.Service.Name, l)
 
@@ -51,7 +55,7 @@ func Run(cfg *config.Config) {
 
 	srv.Init()
 
-	// Register handler
+	// Register handlers
 	if err := pb.RegisterUserHandler(srv.Server(), h); err != nil {
 		l.Fatal(err)
 	}
