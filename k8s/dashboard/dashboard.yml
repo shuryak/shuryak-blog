@@ -16,6 +16,7 @@ spec:
       labels:
         app: dashboard
     spec:
+      restartPolicy: Always
       containers:
         - name: dashboard
           securityContext:

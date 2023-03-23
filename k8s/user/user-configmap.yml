@@ -13,3 +13,4 @@ data:
   PG_URL: postgres://user:supersecret@user-postgres:5432/postgres?sslmode=disable
   MICRO_BROKER: nats
   MICRO_BROKER_ADDRESS: ruser:T0pS3cr3t@nats
+  MICRO_TRANSPORT: nats

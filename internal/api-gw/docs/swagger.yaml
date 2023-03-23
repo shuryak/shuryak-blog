@@ -1,0 +1,92 @@
+definitions:
+  dto.ArticleCreateRequest:
+    properties:
+      content:
+        additionalProperties: true
+        type: object
+      custom_id:
+        example: article-url
+        maxLength: 20
+        minLength: 3
+        type: string
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        maxLength: 150
+        minLength: 5
+        type: string
+    required:
+    - content
+    - custom_id
+    - thumbnail
+    - title
+    type: object
+  dto.SingleArticleResponse:
+    properties:
+      author_id:
+        example: 42
+        type: integer
+      content:
+        additionalProperties: true
+        type: object
+      created_at:
+        example: "2022-10-07T14:26:06.510465Z"
+        type: string
+      custom_id:
+        example: article-url
+        type: string
+      id:
+        example: 1000
+        type: integer
+      thumbnail:
+        example: https://smth.com/thumbnail.png
+        type: string
+      title:
+        example: How to ...
+        type: string
+    type: object
+  errors.Response:
+    properties:
+      error: {}
+    type: object
+info:
+  contact: {}
+paths:
+  /articles/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates an article
+      parameters:
+      - description: article to create
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ArticleCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Response'
+      security:
+      - BearerAuth: []
+      summary: Creates an article
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

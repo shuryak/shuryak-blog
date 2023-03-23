@@ -5,31 +5,45 @@ import (
 	"fmt"
 	"github.com/shuryak/shuryak-blog/internal/articles/handlers"
 	"github.com/shuryak/shuryak-blog/pkg/constants"
-	"github.com/shuryak/shuryak-blog/proto/user"
+	"github.com/shuryak/shuryak-blog/pkg/logger"
+	pb "github.com/shuryak/shuryak-blog/proto/user"
 	"go-micro.dev/v4/client"
+	microLogger "go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/server"
 	"strconv"
 	"strings"
 )
 
-type Wrappers struct {
-	userServerName string
+type AuthWrapper struct {
+	с client.Client
+	l logger.Interface
 }
 
-func AuthWrapper(fn server.HandlerFunc) server.HandlerFunc {
+func NewAuthWrapper(с client.Client, l logger.Interface) *AuthWrapper {
+	return &AuthWrapper{с, l}
+}
+
+var authEndpoints = map[string]struct{}{
+	"Articles.Create": {},
+	"Articles.Update": {},
+	"Articles.Delete": {},
+}
+
+func (w *AuthWrapper) Use(fn server.HandlerFunc) server.HandlerFunc {
 	return func(ctx context.Context, req server.Request, resp interface{}) error {
-		// Health checks
-		if req.Endpoint() == "Health.Check" || req.Endpoint() == "Health.Watch" {
+		if _, isAuthNeeded := authEndpoints[req.Endpoint()]; !isAuthNeeded {
 			return fn(ctx, req, resp)
 		}
 
-		meta, ok := metadata.FromContext(ctx)
+		microLogger.Info("Im here")
+
+		md, ok := metadata.FromContext(ctx)
 		if !ok {
 			return fmt.Errorf(handlers.GlobalErrors.AuthNoMetadata(req.Endpoint()))
 		}
 
-		auth, ok := meta[constants.AuthMetadataName]
+		auth, ok := md.Get(constants.AuthMetadataName)
 		if !ok {
 			return fmt.Errorf(handlers.GlobalErrors.AuthNoToken())
 		}
@@ -41,9 +55,8 @@ func AuthWrapper(fn server.HandlerFunc) server.HandlerFunc {
 
 		token := strings.TrimSpace(authSplit[1])
 
-		userClient := user.NewUserService("user", client.DefaultClient)
-
-		outToken, err := userClient.Validate(ctx, &user.ValidateRequest{AccessToken: token})
+		uc := pb.NewUserService("user", w.с)
+		outToken, err := uc.Validate(ctx, &pb.ValidateRequest{AccessToken: token})
 		if err != nil {
 			return err
 		}

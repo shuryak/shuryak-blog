@@ -1,0 +1,12 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gw-env
+data:
+  HTTP_PORT: :8080
+  MICRO_REGISTRY: kubernetes
+  MICRO_BROKER: nats
+  MICRO_BROKER_ADDRESS: ruser:T0pS3cr3t@nats
+  MICRO_TRANSPORT: nats

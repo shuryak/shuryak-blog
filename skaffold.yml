@@ -1,0 +1,33 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: shuryak-blog
+build:
+  artifacts:
+  - image: api-gw-server
+    context: .
+    docker:
+      dockerfile: internal/api-gw/Dockerfile
+  - image: articles-server
+    context: .
+    docker:
+      dockerfile: internal/articles/Dockerfile
+  - image: user-server
+    context: .
+    docker:
+      dockerfile: internal/user/Dockerfile
+manifests:
+  rawYaml:
+  - k8s/clusterrole.yml
+  - k8s/rolebinding.yml
+  - k8s/nats/nats.yml
+  - k8s/api-gw/api-gw-configmap.yml
+  - k8s/api-gw/api-gw-deployment.yml
+  - k8s/articles/articles-configmap.yml
+  - k8s/articles/articles-deployment.yml
+  - k8s/articles/articles-postgres.yml
+  - k8s/dashboard/dashboard-configmap.yml
+  - k8s/dashboard/dashboard.yml
+  - k8s/user/user-configmap.yml
+  - k8s/user/user-deployment.yml
+  - k8s/user/user-postgres.yml

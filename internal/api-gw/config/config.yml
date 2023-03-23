@@ -1,15 +1,12 @@
 service:
-  name: 'articles'
+  name: 'api-gw'
   version: '1.0.0'
 
-gateways:
-  user_service_name: 'user'
+http:
+  port: '8080'
 
 logger:
-  level: 'debug'
-
-postgres:
-  pool_max: 2
+  log_level: 'debug'
 
 jaeger:
   url: http://jaeger-collector.default.svc.cluster.local:14268/api/traces

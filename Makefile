@@ -1,10 +1,18 @@
 GOPATH:=$(shell go env GOPATH)
 
+.PHONY: minikube-env
+minikube-env:
+	@eval $(minikube -p minikube docker-env)
+
 .PHONY: init
 init:
 	@go get -u google.golang.org/protobuf/proto
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	@go install github.com/go-micro/generator/cmd/protoc-gen-micro@latest
+
+.PHONY: swag-init
+swag-init:
+	@go install github.com/swaggo/swag/cmd/swag@latest
 
 .PHONY: proto
 proto:
@@ -19,6 +27,10 @@ tidy:
 update:
 	@go get -u
 
+.PHONY: swagger
+swagger:
+	@swag init -o internal/api-gw/docs -g internal/api-gw/swagger/swagger.go
+
 .PHONY: build-user
 build-user:
 	@go build -o user cmd/user/*.go
@@ -26,6 +38,10 @@ build-user:
 .PHONY: build-articles
 build-articles:
 	@go build -o articles cmd/articles/*.go
+
+.PHONY: build-api-gw
+build-api-gw:
+	@go build -o api-gw cmd/api-gw/*.go
 
 .PHONY: user-image
 user-image:
@@ -35,13 +51,19 @@ user-image:
 articles-image:
 	docker build -f internal/articles/Dockerfile -t articles-server:latest .
 
+.PHONY: api-gw-image
+api-gw-image:
+	docker build -f internal/api-gw/Dockerfile -t api-gw-server:latest .
+
 .PHONY: apply
 apply:
 	kubectl apply -f k8s/
+	kubectl apply -f k8s/jaeger/
 	kubectl apply -f k8s/nats/
 	kubectl apply -f k8s/user/
 	kubectl apply -f k8s/articles/
 	kubectl apply -f k8s/dashboard/
+	kubectl apply -f k8s/api-gw/
 
 .PHONY: delete
 delete:

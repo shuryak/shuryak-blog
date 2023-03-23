@@ -2,10 +2,14 @@ package config
 
 type (
 	Config struct {
-		Service `yaml:"service"`
+		Service `yaml:"app"`
+		HTTP    `yaml:"http"`
 		Logger  `yaml:"logger"`
-		PG      `yaml:"postgres"`
 		Jaeger  `yaml:"jaeger"`
+	}
+
+	HTTP struct {
+		Port string `yaml:"port" env:"HTTP_PORT"`
 	}
 
 	Service struct {
@@ -14,12 +18,7 @@ type (
 	}
 
 	Logger struct {
-		Level string `yaml:"level" env:"LOG_LEVEL"`
-	}
-
-	PG struct {
-		PoolMax int    `yaml:"pool_max" env:"PG_POOL_MAX"`
-		URL     string `env:"PG_URL"`
+		Level string `env-required:"true" yaml:"log_level" env:"LOG_LEVEL"`
 	}
 
 	Jaeger struct {
