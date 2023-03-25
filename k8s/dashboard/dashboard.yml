@@ -17,6 +17,10 @@ spec:
         app: dashboard
     spec:
       restartPolicy: Always
+      initContainers:
+        - name: message-bus-probe
+          image: busybox:latest
+          command: [ 'sh', '-c', 'until nc -vz nats 4222; do echo "Waiting for NATS..."; sleep 2; done;' ]
       containers:
         - name: dashboard
           securityContext:

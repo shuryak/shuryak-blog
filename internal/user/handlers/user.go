@@ -97,9 +97,7 @@ func (h *UserHandler) RefreshSession(ctx context.Context, req *pb.RefreshSession
 }
 
 func (h *UserHandler) Validate(ctx context.Context, req *pb.ValidateRequest, resp *pb.ValidateResponse) error {
-	h.l.Info(fmt.Sprintf("Access token: %s", req.AccessToken))
 	claims, err := h.jwt.Decode(req.AccessToken)
-	h.l.Info(fmt.Sprintf("Claims: %v", claims))
 	if err != nil {
 		return err // TODO: check Decode internal errors
 	}

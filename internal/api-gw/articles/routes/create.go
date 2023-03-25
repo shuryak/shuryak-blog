@@ -5,6 +5,7 @@ import (
 	"github.com/shuryak/shuryak-blog/internal/api-gw/articles/dto"
 	"github.com/shuryak/shuryak-blog/internal/api-gw/errors"
 	pb "github.com/shuryak/shuryak-blog/proto/articles"
+	microErrors "go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/types/known/structpb"
 	"net/http"
 )
@@ -12,12 +13,14 @@ import (
 // Create godoc
 // @Summary     Creates an article
 // @Description Creates an article
+// @Tags        Articles
 // @Accept      json
 // @Produce     json
 // @Param       request body     dto.ArticleCreateRequest true "article to create"
 // @Success     200     {object} dto.SingleArticleResponse
 // @Failure     400     {object} errors.Response
 // @Failure     500     {object} errors.Response
+// @Failure     502     {object} errors.Response
 // @Router      /articles/create [post]
 // @Security 	BearerAuth
 func (r *Routes) Create(ctx *gin.Context) {
@@ -30,7 +33,7 @@ func (r *Routes) Create(ctx *gin.Context) {
 
 	content, err := structpb.NewStruct(req.Content)
 	if err != nil {
-		r.l.Error(err, "articles - routes - Create")
+		r.l.Error(err, "articles - routes - Create: %v", err)
 		errors.ErrorResponse(ctx, http.StatusInternalServerError, "some problems")
 		return
 	}
@@ -42,11 +45,21 @@ func (r *Routes) Create(ctx *gin.Context) {
 		Content:   content,
 	})
 	if err != nil {
-		r.l.Error(err, "articles - routes - Create")
-		return
+		clientError := microErrors.FromError(err)
+
+		switch clientError.Code {
+		case http.StatusUnauthorized:
+			errors.ErrorResponse(ctx, http.StatusUnauthorized, clientError.Detail)
+		case http.StatusBadRequest:
+			errors.ErrorResponse(ctx, http.StatusBadRequest, "invalid content")
+		case http.StatusBadGateway:
+			errors.ErrorResponse(ctx, http.StatusBadGateway, "articles service error")
+		default:
+			return
+		}
 	}
 
-	res := dto.SingleArticleResponse{
+	resp := dto.SingleArticleResponse{
 		Id:        int(a.Id),
 		CustomId:  a.CustomId,
 		AuthorId:  int(a.AuthorId),
@@ -56,5 +69,5 @@ func (r *Routes) Create(ctx *gin.Context) {
 		CreatedAt: a.CreatedAt.AsTime(),
 	}
 
-	ctx.JSON(http.StatusCreated, &res)
+	ctx.JSON(http.StatusCreated, &resp)
 }

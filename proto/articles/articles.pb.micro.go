@@ -39,7 +39,7 @@ func NewArticlesEndpoints() []*api.Endpoint {
 
 type ArticlesService interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...client.CallOption) (*SingleArticleResponse, error)
-	GetById(ctx context.Context, in *ArticleCustomIdRequest, opts ...client.CallOption) (*SingleArticleResponse, error)
+	GetByCustomId(ctx context.Context, in *ArticleCustomIdRequest, opts ...client.CallOption) (*SingleArticleResponse, error)
 	GetShortMany(ctx context.Context, in *GetManyRequest, opts ...client.CallOption) (*ShortArticlesResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*SingleArticleResponse, error)
 	Delete(ctx context.Context, in *ArticleCustomIdRequest, opts ...client.CallOption) (*SingleArticleResponse, error)
@@ -67,8 +67,8 @@ func (c *articlesService) Create(ctx context.Context, in *CreateRequest, opts ..
 	return out, nil
 }
 
-func (c *articlesService) GetById(ctx context.Context, in *ArticleCustomIdRequest, opts ...client.CallOption) (*SingleArticleResponse, error) {
-	req := c.c.NewRequest(c.name, "Articles.GetById", in)
+func (c *articlesService) GetByCustomId(ctx context.Context, in *ArticleCustomIdRequest, opts ...client.CallOption) (*SingleArticleResponse, error) {
+	req := c.c.NewRequest(c.name, "Articles.GetByCustomId", in)
 	out := new(SingleArticleResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *articlesService) Delete(ctx context.Context, in *ArticleCustomIdRequest
 
 type ArticlesHandler interface {
 	Create(context.Context, *CreateRequest, *SingleArticleResponse) error
-	GetById(context.Context, *ArticleCustomIdRequest, *SingleArticleResponse) error
+	GetByCustomId(context.Context, *ArticleCustomIdRequest, *SingleArticleResponse) error
 	GetShortMany(context.Context, *GetManyRequest, *ShortArticlesResponse) error
 	Update(context.Context, *UpdateRequest, *SingleArticleResponse) error
 	Delete(context.Context, *ArticleCustomIdRequest, *SingleArticleResponse) error
@@ -120,7 +120,7 @@ type ArticlesHandler interface {
 func RegisterArticlesHandler(s server.Server, hdlr ArticlesHandler, opts ...server.HandlerOption) error {
 	type articles interface {
 		Create(ctx context.Context, in *CreateRequest, out *SingleArticleResponse) error
-		GetById(ctx context.Context, in *ArticleCustomIdRequest, out *SingleArticleResponse) error
+		GetByCustomId(ctx context.Context, in *ArticleCustomIdRequest, out *SingleArticleResponse) error
 		GetShortMany(ctx context.Context, in *GetManyRequest, out *ShortArticlesResponse) error
 		Update(ctx context.Context, in *UpdateRequest, out *SingleArticleResponse) error
 		Delete(ctx context.Context, in *ArticleCustomIdRequest, out *SingleArticleResponse) error
@@ -140,8 +140,8 @@ func (h *articlesHandler) Create(ctx context.Context, in *CreateRequest, out *Si
 	return h.ArticlesHandler.Create(ctx, in, out)
 }
 
-func (h *articlesHandler) GetById(ctx context.Context, in *ArticleCustomIdRequest, out *SingleArticleResponse) error {
-	return h.ArticlesHandler.GetById(ctx, in, out)
+func (h *articlesHandler) GetByCustomId(ctx context.Context, in *ArticleCustomIdRequest, out *SingleArticleResponse) error {
+	return h.ArticlesHandler.GetByCustomId(ctx, in, out)
 }
 
 func (h *articlesHandler) GetShortMany(ctx context.Context, in *GetManyRequest, out *ShortArticlesResponse) error {

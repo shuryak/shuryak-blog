@@ -17,8 +17,8 @@ chmod +x /bin/grpc_health_probe
 
 # Build Go binary
 COPY . /go/src/$SERVICE/
-RUN --mount=type=cache,mode=0755,target=/go/pkg/mod make init swag-init swagger && go mod download
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,mode=0755,target=/go/pkg/mod make proto tidy build-api-gw
+RUN --mount=type=cache,mode=0755,target=/go/pkg/mod make init swag-init && go mod download
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,mode=0755,target=/go/pkg/mod make proto swagger tidy build-api-gw
 
 # Deployment container
 FROM scratch

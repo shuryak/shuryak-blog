@@ -10,10 +10,6 @@ init:
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	@go install github.com/go-micro/generator/cmd/protoc-gen-micro@latest
 
-.PHONY: swag-init
-swag-init:
-	@go install github.com/swaggo/swag/cmd/swag@latest
-
 .PHONY: proto
 proto:
 	@protoc --proto_path=. --micro_out=. --go_out=:. proto/user/*.proto
@@ -26,6 +22,10 @@ tidy:
 .PHONY: update
 update:
 	@go get -u
+
+.PHONY: swag-init
+swag-init:
+	@go install github.com/swaggo/swag/cmd/swag@latest
 
 .PHONY: swagger
 swagger:

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	grpcc "github.com/go-micro/plugins/v4/client/grpc"
@@ -11,6 +12,7 @@ import (
 	"github.com/shuryak/shuryak-blog/internal/api-gw/articles"
 	"github.com/shuryak/shuryak-blog/internal/api-gw/config"
 	"github.com/shuryak/shuryak-blog/internal/api-gw/swagger"
+	"github.com/shuryak/shuryak-blog/internal/api-gw/user"
 	"github.com/shuryak/shuryak-blog/pkg/logger"
 	"github.com/shuryak/shuryak-blog/pkg/tracing"
 	"go-micro.dev/v4"
@@ -75,7 +77,12 @@ func Run(cfg *config.Config) {
 
 	engine := gin.New()
 
+	corsCfg := cors.DefaultConfig()
+	corsCfg.AllowOrigins = []string{"http://localhost:8080"}
+	engine.Use(cors.New(corsCfg))
+
 	swagger.RegisterSwagger(engine, cfg, l)
+	user.RegisterRoutes(engine, srv.Client(), cfg, l)
 	articles.RegisterRoutes(engine, srv.Client(), cfg, l)
 
 	_ = engine.Run("0.0.0.0" + cfg.HTTP.Port)

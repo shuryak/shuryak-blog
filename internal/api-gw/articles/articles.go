@@ -17,8 +17,14 @@ func RegisterRoutes(engine *gin.Engine, c client.Client, cfg *config.Config, l l
 
 	r := routes.NewRoutes(srv, l)
 
-	h := engine.Group("/articles").Use(a.TokenRequired)
+	h := engine.Group("/articles")
 	{
-		h.POST("/create", r.Create)
+		h.GET("/get_by_custom_id", r.GetByCustomId)
+		h.GET("/get_many", r.GetMany)
+	}
+
+	h2 := engine.Group("/articles").Use(a.TokenRequired)
+	{
+		h2.POST("/create", r.Create)
 	}
 }

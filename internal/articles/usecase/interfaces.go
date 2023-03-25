@@ -8,7 +8,7 @@ import (
 type (
 	Articles interface {
 		Create(ctx context.Context, a entity.Article) (*entity.Article, error)
-		GetById(ctx context.Context, id uint32) (*entity.Article, error)
+		GetByCustomId(ctx context.Context, customId string) (*entity.Article, error)
 		GetMany(ctx context.Context, offset uint32, count uint32) ([]entity.Article, error)
 		Update(ctx context.Context, a entity.Article) (*entity.Article, error)
 		Delete(ctx context.Context, id uint32) (*entity.Article, error)
@@ -16,7 +16,7 @@ type (
 
 	ArticlesRepo interface {
 		Create(ctx context.Context, a entity.Article) (*entity.Article, error)
-		GetById(ctx context.Context, id uint32) (*entity.Article, error)
+		GetByCustomId(ctx context.Context, customId string) (*entity.Article, error)
 		GetMany(ctx context.Context, offset uint32, count uint32) ([]entity.Article, error)
 		Update(ctx context.Context, a entity.Article) (*entity.Article, error)
 		Delete(ctx context.Context, id uint32) (*entity.Article, error)

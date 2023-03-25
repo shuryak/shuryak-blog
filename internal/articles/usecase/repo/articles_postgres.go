@@ -42,21 +42,21 @@ func (r ArticlesRepo) Create(ctx context.Context, a entity.Article) (*entity.Art
 	return &storedArticle, nil
 }
 
-func (r ArticlesRepo) GetById(ctx context.Context, id uint32) (*entity.Article, error) {
+func (r ArticlesRepo) GetByCustomId(ctx context.Context, customId string) (*entity.Article, error) {
 	sql, args, err := r.Builder.
 		Select("id", "custom_id", "author_id", "title", "content", "thumbnail", "created_at", "updated_at").
 		From("articles").
-		Where(squirrel.Eq{"id": id}).
+		Where(squirrel.Eq{"custom_id": customId}).
 		ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("ArticlesRepo - GetById - r.Builder: %w", err)
+		return nil, fmt.Errorf("ArticlesRepo - GetByCustomId - r.Builder: %w", err)
 	}
 
 	row := r.Pool.QueryRow(ctx, sql, args...)
 	a := entity.Article{}
 	err = row.Scan(&a.Id, &a.CustomId, &a.AuthorId, &a.Title, &a.Content, &a.Thumbnail, &a.CreatedAt, &a.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("PostgresArticlesStore - GetById - row.Scan: %w", err)
+		return nil, fmt.Errorf("PostgresArticlesStore - GetByCustomId - row.Scan: %w", err)
 	}
 
 	return &a, nil

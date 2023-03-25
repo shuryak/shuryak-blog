@@ -9,7 +9,7 @@ import "google/protobuf/timestamp.proto";
 
 service Articles {
   rpc Create(CreateRequest) returns (SingleArticleResponse);
-  rpc GetById(ArticleCustomIdRequest) returns (SingleArticleResponse);
+  rpc GetByCustomId(ArticleCustomIdRequest) returns (SingleArticleResponse);
   rpc GetShortMany(GetManyRequest) returns (ShortArticlesResponse);
   rpc Update(UpdateRequest) returns (SingleArticleResponse);
   rpc Delete(ArticleCustomIdRequest) returns (SingleArticleResponse);
@@ -34,7 +34,7 @@ message SingleArticleResponse {
 }
 
 message ArticleCustomIdRequest {
-  uint32 id = 1;
+  string custom_id = 1;
 }
 
 message GetManyRequest {

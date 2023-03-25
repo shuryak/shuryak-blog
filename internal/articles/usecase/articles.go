@@ -26,10 +26,10 @@ func (uc ArticlesUseCase) Create(ctx context.Context, a entity.Article) (*entity
 	return e, nil
 }
 
-func (uc ArticlesUseCase) GetById(ctx context.Context, id uint32) (*entity.Article, error) {
-	e, err := uc.repo.GetById(ctx, id)
+func (uc ArticlesUseCase) GetByCustomId(ctx context.Context, customId string) (*entity.Article, error) {
+	e, err := uc.repo.GetByCustomId(ctx, customId)
 	if err != nil {
-		return nil, fmt.Errorf("ArticlesUseCase - GetById - uc.repo.GetById: %w", err)
+		return nil, fmt.Errorf("ArticlesUseCase - GetByCustomId - uc.repo.GetByCustomId: %w", err)
 	}
 
 	return e, nil
