@@ -61,3 +61,30 @@ func (m *JWTManager) Decode(accessToken string) (*UserClaims, error) {
 
 	return claims, nil
 }
+
+func (m *JWTManager) DecodeWithoutValidation(accessToken string) (*UserClaims, error) {
+	token, err := jwt.ParseWithClaims(
+		accessToken,
+		&UserClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			_, ok := token.Method.(*jwt.SigningMethodHMAC)
+			if !ok {
+				return nil, fmt.Errorf("unexpected token signing method")
+			}
+
+			return []byte(m.secret), nil
+		},
+		jwt.WithoutClaimsValidation(),
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("invalid token: %w", err)
+	}
+
+	claims, ok := token.Claims.(*UserClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+
+	return claims, nil
+}

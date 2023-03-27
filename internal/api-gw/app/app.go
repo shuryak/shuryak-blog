@@ -78,7 +78,7 @@ func Run(cfg *config.Config) {
 	engine := gin.New()
 
 	corsCfg := cors.DefaultConfig()
-	corsCfg.AllowOrigins = []string{"http://localhost:8080"}
+	corsCfg.AllowAllOrigins = true
 	engine.Use(cors.New(corsCfg))
 
 	swagger.RegisterSwagger(engine, cfg, l)

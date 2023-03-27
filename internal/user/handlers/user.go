@@ -8,6 +8,7 @@ import (
 	"github.com/shuryak/shuryak-blog/pkg/errors"
 	"github.com/shuryak/shuryak-blog/pkg/logger"
 	pb "github.com/shuryak/shuryak-blog/proto/user"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type UserHandler struct {
@@ -70,18 +71,24 @@ func (h *UserHandler) Login(ctx context.Context, req *pb.LoginRequest, resp *pb.
 
 	resp.AccessToken = accessToken
 	resp.RefreshToken = session.RefreshToken
+	resp.ExpiresAt = timestamppb.New(session.ExpiresAt)
 	return nil
 }
 
 func (h *UserHandler) RefreshSession(ctx context.Context, req *pb.RefreshSessionRequest, resp *pb.TokenPairResponse) error {
-	user, err := h.users.GetByUsername(ctx, req.GetUsername())
+	claims, err := h.jwt.DecodeWithoutValidation(req.GetAccessToken())
+	if err != nil {
+		return fmt.Errorf("cannot decode access token")
+	}
+
+	user, err := h.users.GetByUsername(ctx, claims.Username)
 
 	// TODO: global errors
 	if err != nil {
 		return fmt.Errorf("cannot find user: %w", err)
 	}
 
-	us, err := h.sessions.Refresh(ctx, user.Id) // TODO: check refresh token in usecase
+	session, err := h.sessions.Refresh(ctx, user.Id) // TODO: check refresh token in usecase
 	if err != nil {
 		return err
 	}
@@ -92,7 +99,8 @@ func (h *UserHandler) RefreshSession(ctx context.Context, req *pb.RefreshSession
 	}
 
 	resp.AccessToken = accessToken
-	resp.RefreshToken = us.RefreshToken
+	resp.RefreshToken = session.RefreshToken
+	resp.ExpiresAt = timestamppb.New(session.ExpiresAt)
 	return nil
 }
 
@@ -116,8 +124,6 @@ func (h *UserHandler) Validate(ctx context.Context, req *pb.ValidateRequest, res
 	resp.UserId = user.Id
 	resp.Username = user.Username
 	resp.IsValid = true
-
-	h.l.Info(fmt.Sprintf("Response: %v", *resp))
 
 	return nil
 }

@@ -23,7 +23,7 @@ func RegisterRoutes(engine *gin.Engine, c client.Client, cfg *config.Config, l l
 		h.GET("/get_many", r.GetMany)
 	}
 
-	h2 := engine.Group("/articles").Use(a.TokenRequired)
+	h2 := engine.Group("/articles").Use(a.ContextBearerString)
 	{
 		h2.POST("/create", r.Create)
 	}

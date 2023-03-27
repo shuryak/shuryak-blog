@@ -34,10 +34,11 @@ message LoginRequest {
 message TokenPairResponse {
   string access_token = 1;
   string refresh_token = 2;
+  google.protobuf.Timestamp expires_at = 3;
 }
 
 message RefreshSessionRequest {
-  string username = 1;
+  string access_token = 1;
   string refresh_token = 2;
 }
 

@@ -45,5 +45,7 @@ shuryak-blog/
 ## Полезные ссылки
 
 - [So you need to wait for some Kubernetes resources?](https://vadosware.io/post/so-you-need-to-wait-for-some-kubernetes-resources/)
-  — о том, как дождаться готовности ресурсов Kubernetes.
+  — о том, как дождаться готовности ресурсов Kubernetes;
+- [Про токены, JSON Web Tokens (JWT), аутентификацию и авторизацию. Token-Based Authentication](https://gist.github.com/zmts/802dc9c3510d79fd40f9dc38a12bccfc)
+  — всё, что нужно знать про распределённую аутентификацию и авторизацию с помощью JWT-токенов.
 - ...
