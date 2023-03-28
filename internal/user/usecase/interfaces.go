@@ -21,13 +21,13 @@ type (
 
 	UserSessions interface {
 		Add(ctx context.Context, userId uint32) (*entity.UserSession, error)
-		Refresh(ctx context.Context, userId uint32) (*entity.UserSession, error)
+		Refresh(ctx context.Context, userId uint32, refreshToken string) (*entity.UserSession, error)
 	}
 
 	UserSessionsRepo interface {
 		Create(ctx context.Context, us entity.UserSession) (*entity.UserSession, error)
 		Get(ctx context.Context, id uint32) (*entity.UserSession, error)
-		Update(ctx context.Context, us entity.UserSession) (*entity.UserSession, error)
+		Update(ctx context.Context, us entity.UserSession, refreshToken string) (*entity.UserSession, error)
 		Delete(ctx context.Context, us entity.UserSession) (*entity.UserSession, error)
 	}
 )

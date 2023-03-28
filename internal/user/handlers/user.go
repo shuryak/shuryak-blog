@@ -88,7 +88,7 @@ func (h *UserHandler) RefreshSession(ctx context.Context, req *pb.RefreshSession
 		return fmt.Errorf("cannot find user: %w", err)
 	}
 
-	session, err := h.sessions.Refresh(ctx, user.Id) // TODO: check refresh token in usecase
+	session, err := h.sessions.Refresh(ctx, user.Id, req.GetRefreshToken()) // TODO: check refresh token in usecase
 	if err != nil {
 		return err
 	}

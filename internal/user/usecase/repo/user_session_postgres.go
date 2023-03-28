@@ -51,7 +51,7 @@ func (r UserSessionsRepo) Get(ctx context.Context, id uint32) (*entity.UserSessi
 	panic("implement me")
 }
 
-func (r UserSessionsRepo) Update(ctx context.Context, us entity.UserSession) (*entity.UserSession, error) {
+func (r UserSessionsRepo) Update(ctx context.Context, us entity.UserSession, refreshToken string) (*entity.UserSession, error) {
 	clauses := make(map[string]interface{})
 	clauses["user_id"] = us.UserId
 	clauses["refresh_token"] = us.RefreshToken
@@ -61,7 +61,7 @@ func (r UserSessionsRepo) Update(ctx context.Context, us entity.UserSession) (*e
 	sql, args, err := r.Builder.
 		Update("user_sessions").
 		SetMap(clauses).
-		Where(squirrel.Eq{"user_id": us.UserId, "refresh_token": us.RefreshToken}).
+		Where(squirrel.Eq{"user_id": us.UserId, "refresh_token": refreshToken}).
 		Suffix("RETURNING \"user_id\", \"refresh_token\", \"expires_at\", \"updated_at\", \"created_at\"").
 		ToSql()
 	if err != nil {

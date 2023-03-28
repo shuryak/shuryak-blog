@@ -42,8 +42,8 @@ func (uc UserSessionUseCase) Add(ctx context.Context, userId uint32) (*entity.Us
 	return e, nil
 }
 
-func (uc UserSessionUseCase) Refresh(ctx context.Context, userId uint32) (*entity.UserSession, error) {
-	refreshToken, err := uc.generateRefreshToken()
+func (uc UserSessionUseCase) Refresh(ctx context.Context, userId uint32, refreshToken string) (*entity.UserSession, error) {
+	newRefreshToken, err := uc.generateRefreshToken()
 	if err != nil {
 		return nil, fmt.Errorf("UserSessionUseCase - Refresh - uc.generateRefreshToken: %w", err)
 	}
@@ -52,10 +52,10 @@ func (uc UserSessionUseCase) Refresh(ctx context.Context, userId uint32) (*entit
 
 	e, err := uc.repo.Update(ctx, entity.UserSession{
 		UserId:       userId,
-		RefreshToken: refreshToken,
+		RefreshToken: newRefreshToken,
 		ExpiresAt:    now.Add(uc.sessionDuration),
 		UpdatedAt:    now,
-	})
+	}, refreshToken)
 
 	return e, nil
 }
