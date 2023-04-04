@@ -16,26 +16,29 @@ import (
 // @Tags        User
 // @Accept      json
 // @Produce     json
-// @Success     200     {object} dto.AccessTokenResponse
-// @Failure     400     {object} errors.Response
-// @Failure     500     {object} errors.Response
-// @Failure     502     {object} errors.Response
+// @Param   	username  query    string true "username"
+// @Success     200       {object} dto.AccessTokenResponse
+// @Failure     400       {object} errors.Response
+// @Failure     500       {object} errors.Response
+// @Failure     502       {object} errors.Response
 // @Router      /user/refresh_session [get]
 // @Security 	BearerAuth
 func (r *Routes) RefreshSession(ctx *gin.Context) {
+	var req dto.RefreshSessionRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		r.l.Error(err, "user - routes - RefreshSession")
+		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+
 	refreshToken, err := ctx.Cookie(constants.RefreshTokenCookieName)
 	if err != nil {
 		errors.ErrorResponse(ctx, http.StatusBadRequest, "no refresh token")
 		return
 	}
-	accessToken, ok := ctx.Get(constants.AuthMetadataName)
-	if !ok {
-		errors.ErrorResponse(ctx, http.StatusBadRequest, "no access token")
-		return
-	}
 
 	tokenPair, err := r.c.RefreshSession(ctx.Request.Context(), &pb.RefreshSessionRequest{
-		AccessToken:  accessToken.(string),
+		Username:     req.Username,
 		RefreshToken: refreshToken,
 	})
 	if err != nil {

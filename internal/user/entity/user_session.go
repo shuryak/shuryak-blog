@@ -1,12 +1,15 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type UserSession struct {
-	// TODO: IP and UserAgent
-	UserId       uint32
-	RefreshToken string
-	ExpiresAt    time.Time
-	UpdatedAt    time.Time
-	CreatedAt    time.Time
+	// TODO: Fingerprint
+	Id        uuid.UUID
+	UserId    uint32
+	ExpiresAt time.Time
+	UpdatedAt time.Time
+	CreatedAt time.Time
 }

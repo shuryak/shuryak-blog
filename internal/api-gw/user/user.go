@@ -3,7 +3,6 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/shuryak/shuryak-blog/internal/api-gw/config"
-	"github.com/shuryak/shuryak-blog/internal/api-gw/middleware"
 	"github.com/shuryak/shuryak-blog/internal/api-gw/user/routes"
 	"github.com/shuryak/shuryak-blog/pkg/logger"
 	pb "github.com/shuryak/shuryak-blog/proto/user"
@@ -11,8 +10,6 @@ import (
 )
 
 func RegisterRoutes(engine *gin.Engine, c client.Client, cfg *config.Config, l logger.Interface) {
-	a := middleware.NewTokenMiddleware(l)
-
 	srv := pb.NewUserService("user", c)
 
 	r := routes.NewRoutes(srv, l)
@@ -23,7 +20,7 @@ func RegisterRoutes(engine *gin.Engine, c client.Client, cfg *config.Config, l l
 		h.POST("/register", r.Register)
 	}
 
-	h2 := engine.Group("/user").Use(a.ContextToken)
+	h2 := engine.Group("/user")
 	{
 		h2.GET("/refresh_session", r.RefreshSession)
 	}

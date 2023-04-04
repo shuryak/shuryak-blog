@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/shuryak/shuryak-blog/internal/user/entity"
 )
 
@@ -21,13 +22,13 @@ type (
 
 	UserSessions interface {
 		Add(ctx context.Context, userId uint32) (*entity.UserSession, error)
-		Refresh(ctx context.Context, userId uint32, refreshToken string) (*entity.UserSession, error)
+		Refresh(ctx context.Context, sessionId uuid.UUID, userId uint32) (*entity.UserSession, error)
 	}
 
 	UserSessionsRepo interface {
 		Create(ctx context.Context, us entity.UserSession) (*entity.UserSession, error)
 		Get(ctx context.Context, id uint32) (*entity.UserSession, error)
-		Update(ctx context.Context, us entity.UserSession, refreshToken string) (*entity.UserSession, error)
-		Delete(ctx context.Context, us entity.UserSession) (*entity.UserSession, error)
+		Update(ctx context.Context, sessionId uuid.UUID, newUserSession entity.UserSession) (*entity.UserSession, error)
+		Delete(ctx context.Context, sessionId uuid.UUID) (*entity.UserSession, error)
 	}
 )

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/shuryak/shuryak-blog/internal/user/entity"
 	"github.com/shuryak/shuryak-blog/internal/user/usecase"
 	"github.com/shuryak/shuryak-blog/pkg/errors"
@@ -70,25 +71,20 @@ func (h *UserHandler) Login(ctx context.Context, req *pb.LoginRequest, resp *pb.
 	}
 
 	resp.AccessToken = accessToken
-	resp.RefreshToken = session.RefreshToken
+	resp.RefreshToken = session.Id.String()
 	resp.ExpiresAt = timestamppb.New(session.ExpiresAt)
 	return nil
 }
 
 func (h *UserHandler) RefreshSession(ctx context.Context, req *pb.RefreshSessionRequest, resp *pb.TokenPairResponse) error {
-	claims, err := h.jwt.DecodeWithoutValidation(req.GetAccessToken())
-	if err != nil {
-		return fmt.Errorf("cannot decode access token")
-	}
-
-	user, err := h.users.GetByUsername(ctx, claims.Username)
+	user, err := h.users.GetByUsername(ctx, req.GetUsername())
 
 	// TODO: global errors
 	if err != nil {
 		return fmt.Errorf("cannot find user: %w", err)
 	}
 
-	session, err := h.sessions.Refresh(ctx, user.Id, req.GetRefreshToken()) // TODO: check refresh token in usecase
+	session, err := h.sessions.Refresh(ctx, uuid.MustParse(req.GetRefreshToken()), user.Id) // TODO: check refresh token in usecase
 	if err != nil {
 		return err
 	}
@@ -99,7 +95,7 @@ func (h *UserHandler) RefreshSession(ctx context.Context, req *pb.RefreshSession
 	}
 
 	resp.AccessToken = accessToken
-	resp.RefreshToken = session.RefreshToken
+	resp.RefreshToken = session.Id.String()
 	resp.ExpiresAt = timestamppb.New(session.ExpiresAt)
 	return nil
 }

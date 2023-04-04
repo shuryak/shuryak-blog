@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS user_sessions;
+
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id            BIGSERIAL PRIMARY KEY NOT NULL,
+    user_id       BIGINT REFERENCES users (id),
+    refresh_token TEXT NOT NULL,
+    expires_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+DROP EXTENSION IF EXISTS "uuid-ossp";

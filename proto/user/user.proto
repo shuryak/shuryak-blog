@@ -38,7 +38,7 @@ message TokenPairResponse {
 }
 
 message RefreshSessionRequest {
-  string access_token = 1;
+  string username = 1;
   string refresh_token = 2;
 }
 

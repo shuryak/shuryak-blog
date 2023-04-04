@@ -1,5 +1,5 @@
 package dto
 
 type RefreshSessionRequest struct {
-	RefreshToken string `json:"refresh_token" binding:"required"`
+	Username string `form:"username" json:"username" binding:"required"`
 }
