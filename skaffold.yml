@@ -5,17 +5,17 @@ metadata:
 build:
   artifacts:
   - image: api-gw-server
-    context: .
-    docker:
-      dockerfile: internal/api-gw/Dockerfile
+    context: internal/api-gw/
+    custom:
+      buildCommand: cd ../.. && make api-gw-image
   - image: articles-server
-    context: .
-    docker:
-      dockerfile: internal/articles/Dockerfile
+    context: internal/articles/
+    custom:
+      buildCommand: cd ../.. && make articles-image
   - image: user-server
-    context: .
-    docker:
-      dockerfile: internal/user/Dockerfile
+    context: internal/user/
+    custom:
+      buildCommand: cd ../.. && make user-image
 manifests:
   rawYaml:
   - k8s/clusterrole.yml
