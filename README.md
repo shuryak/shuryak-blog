@@ -47,5 +47,7 @@ shuryak-blog/
 - [So you need to wait for some Kubernetes resources?](https://vadosware.io/post/so-you-need-to-wait-for-some-kubernetes-resources/)
   — о том, как дождаться готовности ресурсов Kubernetes;
 - [Про токены, JSON Web Tokens (JWT), аутентификацию и авторизацию. Token-Based Authentication](https://gist.github.com/zmts/802dc9c3510d79fd40f9dc38a12bccfc)
-  — всё, что нужно знать про распределённую аутентификацию и авторизацию с помощью JWT-токенов.
+  — всё, что нужно знать про распределённую аутентификацию и авторизацию с помощью JWT-токенов;
+- [Contract between Skaffold and Custom Build Script](https://skaffold.dev/docs/builders/builder-types/custom/#contract-between-skaffold-and-custom-build-script)
+  — переменные окружения для взаимодействия Skaffold с пользовательским build-скриптом.
 - ...

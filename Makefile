@@ -45,15 +45,15 @@ build-api-gw:
 
 .PHONY: user-image
 user-image:
-	docker build -f internal/user/Dockerfile -t user-server .
+	docker build -f internal/user/Dockerfile -t ${IMAGE} .
 
 .PHONY: articles-image
 articles-image:
-	docker build -f internal/articles/Dockerfile -t articles-server .
+	docker build -f internal/articles/Dockerfile -t ${IMAGE} .
 
 .PHONY: api-gw-image
 api-gw-image:
-	docker build -f internal/api-gw/Dockerfile -t api-gw-server .
+	docker build -f internal/api-gw/Dockerfile -t ${IMAGE} .
 
 .PHONY: apply
 apply:

@@ -8,14 +8,23 @@ build:
     context: internal/api-gw/
     custom:
       buildCommand: cd ../.. && make api-gw-image
+      dependencies:
+        dockerfile:
+          path: Dockerfile
   - image: articles-server
     context: internal/articles/
     custom:
       buildCommand: cd ../.. && make articles-image
+      dependencies:
+        dockerfile:
+          path: Dockerfile
   - image: user-server
     context: internal/user/
     custom:
       buildCommand: cd ../.. && make user-image
+      dependencies:
+        dockerfile:
+          path: Dockerfile
 manifests:
   rawYaml:
   - k8s/clusterrole.yml
