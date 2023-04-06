@@ -1,3 +1,12 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-articles
+  labels:
+    app: local-articles
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
 ---
 
 apiVersion: v1
@@ -6,31 +15,32 @@ metadata:
   name: articles-postgres-volume
   labels:
     type: local
-    app: articles-postgres
+    app: articles-postgres-volume
 spec:
-  storageClassName: manual
+  storageClassName: local-articles
   capacity:
     storage: 3Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   hostPath:
-    path: "/data/articles-postgresql"
+    path: "/mnt/data/articles-postgres"
 
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: articles-postgres-volume-claim
+  name: articles-postgres-claim
   labels:
-    app: articles-postgres
+    app: articles-postgres-claim
 spec:
-  storageClassName: manual
+  storageClassName: local-articles
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 3Gi
+  volumeName: articles-postgres-volume
 
 ---
 
@@ -38,6 +48,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: articles-postgres
+  labels:
+    app: articles-postgres
 spec:
   replicas: 1
   selector:
@@ -63,7 +75,7 @@ spec:
       volumes:
         - name: articles-postgres-data
           persistentVolumeClaim:
-            claimName: articles-postgres-volume-claim
+            claimName: articles-postgres-claim
 
 ---
 
@@ -76,7 +88,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 5433
+    - port: 5432
       targetPort: 5432
       nodePort: 30021
   selector:

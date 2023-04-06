@@ -1,3 +1,12 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-user
+  labels:
+    app: local-user
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
 ---
 
 apiVersion: v1
@@ -6,31 +15,32 @@ metadata:
   name: user-postgres-volume
   labels:
     type: local
-    app: user-postgres
+    app: user-postgres-volume
 spec:
-  storageClassName: manual
+  storageClassName: local-user
   capacity:
     storage: 3Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   hostPath:
-    path: "/data/user-postgresql"
+    path: "/mnt/data/user-postgres"
 
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: user-postgres-volume-claim
+  name: user-postgres-claim
   labels:
-    app: user-postgres
+    app: user-postgres-claim
 spec:
-  storageClassName: manual
+  storageClassName: local-user
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 3Gi
+  volumeName: user-postgres-volume
 
 ---
 
@@ -38,6 +48,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user-postgres
+  labels:
+    app: user-postgres
 spec:
   replicas: 1
   selector:
@@ -63,7 +75,7 @@ spec:
       volumes:
         - name: user-postgres-data
           persistentVolumeClaim:
-            claimName: user-postgres-volume-claim
+            claimName: user-postgres-claim
 
 ---
 

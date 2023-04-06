@@ -22,7 +22,7 @@ func Run(cfg *config.Config) {
 	l := logger.New(cfg.Logger.Level)
 
 	// Migrations
-	m, err := migrate.New("file://../migrations", cfg.PG.URL)
+	m, err := migrate.New("file://migrations", cfg.PG.URL)
 	if err != nil {
 		l.Fatal(fmt.Errorf("app - Run - migrate.New: %w", err))
 	}
