@@ -77,9 +77,19 @@ func Run(cfg *config.Config) {
 
 	engine := gin.New()
 
-	corsCfg := cors.DefaultConfig()
-	corsCfg.AllowAllOrigins = true
-	engine.Use(cors.New(corsCfg))
+	engine.Use()
+
+	//corsCfg := cors.DefaultConfig()
+	//corsCfg.AllowOrigins = []string{"http://localhost:5173"}
+	//corsCfg.AllowCredentials = true
+	//engine.Use(cors.New(corsCfg))
+
+	engine.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.49.2:30050"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept-Encoding"},
+		ExposeHeaders:    []string{"Set-Cookie", "Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods"},
+		AllowCredentials: true,
+	}))
 
 	swagger.RegisterSwagger(engine, cfg, l)
 	user.RegisterRoutes(engine, srv.Client(), cfg, l)

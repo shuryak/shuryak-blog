@@ -16,6 +16,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.3.0
 	github.com/ilyakaznacheev/cleanenv v1.4.2
 	github.com/jackc/pgx/v5 v5.3.0
 	github.com/rs/zerolog v1.29.0
@@ -28,7 +29,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.14.0
 	golang.org/x/crypto v0.6.0
 	google.golang.org/grpc v1.45.0
-	google.golang.org/protobuf v1.28.1
+	google.golang.org/protobuf v1.30.0
 )
 
 require (
@@ -65,7 +66,6 @@ require (
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.0.4 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect

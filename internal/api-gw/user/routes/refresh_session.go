@@ -54,6 +54,7 @@ func (r *Routes) RefreshSession(ctx *gin.Context) {
 
 	sessionExpIn := tokenPair.GetExpiresAt().AsTime().Sub(time.Now()).Seconds()
 
-	ctx.SetCookie(constants.RefreshTokenCookieName, tokenPair.GetRefreshToken(), int(sessionExpIn), "/", "", true, true)
+	ctx.SetSameSite(http.SameSiteNoneMode)
+	ctx.SetCookie(constants.RefreshTokenCookieName, tokenPair.GetRefreshToken(), int(sessionExpIn), "/", "localhost", true, true)
 	ctx.JSON(http.StatusOK, &resp)
 }

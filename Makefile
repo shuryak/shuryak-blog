@@ -72,3 +72,7 @@ delete:
 	kubectl delete pvc --all
 	kubectl delete pv --all
 	kubectl delete cm --all
+
+.PHONY: api-gw-port-forward
+api-gw-port-forward:
+	kubectl port-forward svc/api-gw 8080:8080
