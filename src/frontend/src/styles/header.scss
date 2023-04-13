@@ -1,0 +1,96 @@
+@import 'global';
+
+header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 60px;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-bottom: $border;
+  margin: 0;
+  padding: 0 0 0 20px;
+  z-index: 9999;
+
+  p {
+    font-size: 12px;
+    font-weight: 500;
+    color: $grayText;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 30px;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 60px;
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-bottom: $border;
+  margin: 0;
+  padding: 0 0 0 25px;
+  z-index: 9999;
+
+  nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+
+    a {
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      color: $grayText;
+      padding: 0;
+      margin: 0 15px 0 0;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+
+      &:hover {
+        color: darken($grayText, 15);
+      }
+
+      &:active {
+        margin-top: 1px;
+      }
+    }
+  }
+}
+
+.name {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 18px;
+  color: blue;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border-radius: 5px;
+  padding: 2px 5px;
+  transition: 200ms;
+
+  &:hover {
+    background-color: $bgColor;
+  }
+}
+
+.extra-name {
+  margin-left: 20px;
+}
+
+.red {
+  color: red;
+}
