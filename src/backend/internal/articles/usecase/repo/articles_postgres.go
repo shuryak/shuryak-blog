@@ -7,6 +7,7 @@ import (
 	"github.com/shuryak/shuryak-blog/internal/articles/entity"
 	"github.com/shuryak/shuryak-blog/internal/articles/usecase"
 	"github.com/shuryak/shuryak-blog/pkg/postgres"
+	"time"
 )
 
 type ArticlesRepo struct {
@@ -103,6 +104,7 @@ func (r ArticlesRepo) Update(ctx context.Context, a entity.Article) (*entity.Art
 	clauses["thumbnail"] = a.Thumbnail
 	clauses["content"] = a.Content
 	clauses["is_draft"] = a.IsDraft
+	clauses["updated_at"] = time.Now()
 
 	sql, args, err := r.Builder.
 		Update("articles").

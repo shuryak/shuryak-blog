@@ -119,8 +119,54 @@ func (h *ArticlesHandler) GetMany(ctx context.Context, req *pb.GetManyRequest, r
 }
 
 func (h *ArticlesHandler) Update(ctx context.Context, req *pb.UpdateRequest, resp *pb.SingleArticleResponse) error {
-	//TODO implement me
-	panic("implement me")
+	meta, _ := metadata.FromContext(ctx)
+	userId, err := strconv.ParseUint(meta[constants.UserIdMetadataName], 10, 32)
+	if err != nil {
+		h.l.Error("articles - Update - metadata: %v", err)
+		return errors.Unauthorized("metadata", "can't parse %s from metadata", constants.UserIdMetadataName)
+	}
+
+	a, err := h.uc.GetByCustomId(ctx, req.GetCustomId())
+	if err != nil {
+		h.l.Error("articles - Update - h.uc.GetByCustomId: %v", err)
+		return errors.BadRequest("no", "article not found") // TODO: error or not found?
+	}
+
+	if a.AuthorId != uint32(userId) {
+		return errors.Unauthorized("forbidden", "no rights to edit the article")
+	}
+
+	updated, err := h.uc.Update(ctx, entity.Article{
+		Id:        a.Id,
+		CustomId:  req.GetCustomId(),
+		AuthorId:  uint32(userId),
+		Title:     req.GetTitle(),
+		Thumbnail: req.GetThumbnail(),
+		Content:   req.GetContent().AsMap(),
+		IsDraft:   req.GetIsDraft(),
+	})
+	if err != nil {
+		h.l.Error("articles - Update - h.uc.Update: %v", err)
+		return errors.InternalServerError("articles", "article update error")
+	}
+
+	content, err := structpb.NewStruct(updated.Content)
+	if err != nil {
+		h.l.Error("articles - Update - structpb.NewStruct: %v", err)
+		return errors.BadRequest("pbstruct", "invalid content")
+	}
+
+	resp.Id = updated.Id
+	resp.CustomId = updated.CustomId
+	resp.AuthorId = updated.AuthorId
+	resp.Title = updated.Title
+	resp.Thumbnail = updated.Thumbnail
+	resp.Content = content
+	resp.IsDraft = updated.IsDraft
+	resp.CreatedAt = timestamppb.New(updated.CreatedAt)
+	resp.UpdatedAt = timestamppb.New(updated.UpdatedAt)
+
+	return nil
 }
 
 func (h *ArticlesHandler) Delete(ctx context.Context, req *pb.ArticleCustomIdRequest, resp *pb.SingleArticleResponse) error {

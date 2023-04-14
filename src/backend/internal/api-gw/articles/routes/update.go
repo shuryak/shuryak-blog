@@ -10,35 +10,35 @@ import (
 	"net/http"
 )
 
-// Create godoc
-// @Summary     Creates an article
-// @Description Creates an article
+// Update godoc
+// @Summary     Update an article
+// @Description Update an article
 // @Tags        Articles
 // @Accept      json
 // @Produce     json
-// @Param       request body     dto.ArticleCreateRequest true "article to create"
+// @Param       request body     dto.ArticleUpdateRequest true "article updated data"
 // @Success     200     {object} dto.SingleArticleResponse
 // @Failure     400     {object} errors.Response
 // @Failure     500     {object} errors.Response
 // @Failure     502     {object} errors.Response
-// @Router      /articles/create [post]
+// @Router      /articles/update [patch]
 // @Security 	BearerAuth
-func (r *Routes) Create(ctx *gin.Context) {
-	var req dto.ArticleCreateRequest
+func (r *Routes) Update(ctx *gin.Context) {
+	var req dto.ArticleUpdateRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		r.l.Error(err, "articles - routes - Create: %v", err)
+		r.l.Error(err, "articles - routes - Update: %v", err)
 		errors.ValidationErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	content, err := structpb.NewStruct(req.Content)
 	if err != nil {
-		r.l.Error(err, "articles - routes - Create: %v", err)
+		r.l.Error(err, "articles - routes - Update: %v", err)
 		errors.ErrorResponse(ctx, http.StatusInternalServerError, "some problems")
 		return
 	}
 
-	a, err := r.c.Create(ctx.Request.Context(), &pb.CreateRequest{
+	a, err := r.c.Update(ctx.Request.Context(), &pb.UpdateRequest{
 		CustomId:  req.CustomId,
 		Title:     req.Title,
 		Thumbnail: req.Thumbnail,
@@ -52,7 +52,7 @@ func (r *Routes) Create(ctx *gin.Context) {
 		case http.StatusUnauthorized:
 			errors.ErrorResponse(ctx, http.StatusUnauthorized, clientError.Detail)
 		case http.StatusBadRequest:
-			errors.ErrorResponse(ctx, http.StatusBadRequest, "invalid content")
+			errors.ErrorResponse(ctx, http.StatusBadRequest, "bad request")
 		case http.StatusBadGateway:
 			errors.ErrorResponse(ctx, http.StatusBadGateway, "articles service error")
 		default:
@@ -72,5 +72,5 @@ func (r *Routes) Create(ctx *gin.Context) {
 		UpdatedAt: a.UpdatedAt.AsTime(),
 	}
 
-	ctx.JSON(http.StatusCreated, &resp)
+	ctx.JSON(http.StatusOK, &resp)
 }

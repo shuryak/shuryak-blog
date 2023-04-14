@@ -26,5 +26,6 @@ func RegisterRoutes(engine *gin.Engine, c client.Client, cfg *config.Config, l l
 	h2 := engine.Group("/articles").Use(a.ContextBearerString)
 	{
 		h2.POST("/create", r.Create)
+		h2.PATCH("/update", r.Update)
 	}
 }
