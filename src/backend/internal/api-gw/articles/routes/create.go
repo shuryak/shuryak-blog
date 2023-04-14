@@ -43,6 +43,7 @@ func (r *Routes) Create(ctx *gin.Context) {
 		Title:     req.Title,
 		Thumbnail: req.Thumbnail,
 		Content:   content,
+		IsDraft:   *req.IsDraft,
 	})
 	if err != nil {
 		clientError := microErrors.FromError(err)
@@ -66,7 +67,9 @@ func (r *Routes) Create(ctx *gin.Context) {
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   a.Content.AsMap(),
+		IsDraft:   a.IsDraft,
 		CreatedAt: a.CreatedAt.AsTime(),
+		UpdatedAt: a.UpdatedAt.AsTime(),
 	}
 
 	ctx.JSON(http.StatusCreated, &resp)

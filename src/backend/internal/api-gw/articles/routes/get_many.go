@@ -29,9 +29,10 @@ func (r *Routes) GetMany(ctx *gin.Context) {
 		return
 	}
 
-	articles, err := r.c.GetShortMany(ctx.Request.Context(), &pb.GetManyRequest{
-		Offset: req.Offset,
-		Count:  req.Count,
+	articles, err := r.c.GetMany(ctx.Request.Context(), &pb.GetManyRequest{
+		Offset:   *req.Offset,
+		Count:    *req.Count,
+		IsDrafts: *req.IsDrafts,
 	})
 	if err != nil {
 		clientError := microErrors.FromError(err)
@@ -43,12 +44,15 @@ func (r *Routes) GetMany(ctx *gin.Context) {
 	var resp dto.ManyArticlesResponse
 	for _, a := range articles.Articles {
 		resp.Articles = append(resp.Articles, &dto.ShortArticleResponse{
-			Id:        int(a.Id),
-			CustomId:  a.CustomId,
-			AuthorId:  int(a.AuthorId),
-			Title:     a.Title,
-			Thumbnail: a.Thumbnail,
-			CreatedAt: a.CreatedAt.AsTime(),
+			Id:           int(a.Id),
+			CustomId:     a.CustomId,
+			AuthorId:     int(a.AuthorId),
+			Title:        a.Title,
+			Thumbnail:    a.Thumbnail,
+			ShortContent: a.ShortContent,
+			IsDraft:      a.IsDraft,
+			CreatedAt:    a.CreatedAt.AsTime(),
+			UpdatedAt:    a.UpdatedAt.AsTime(),
 		})
 	}
 

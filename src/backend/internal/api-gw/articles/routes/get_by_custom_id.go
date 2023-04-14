@@ -43,7 +43,9 @@ func (r *Routes) GetByCustomId(ctx *gin.Context) {
 		Title:     a.Title,
 		Thumbnail: a.Thumbnail,
 		Content:   a.Content.AsMap(),
+		IsDraft:   a.IsDraft,
 		CreatedAt: a.CreatedAt.AsTime(),
+		UpdatedAt: a.UpdatedAt.AsTime(),
 	}
 
 	ctx.JSON(http.StatusOK, &resp)

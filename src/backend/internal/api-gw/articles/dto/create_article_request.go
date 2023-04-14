@@ -5,4 +5,5 @@ type ArticleCreateRequest struct {
 	Title     string                 `json:"title" binding:"min=5,max=150,required" example:"How to ..."`
 	Thumbnail string                 `json:"thumbnail" binding:"url,required" example:"https://smth.com/thumbnail.png"`
 	Content   map[string]interface{} `json:"content" binding:"required"`
+	IsDraft   *bool                  `json:"is_draft" binding:"required" example:"true"`
 }
