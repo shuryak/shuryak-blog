@@ -40,6 +40,7 @@ func (h *ArticlesHandler) Create(ctx context.Context, req *pb.CreateRequest, res
 		Title:     req.GetTitle(),
 		Thumbnail: req.GetThumbnail(),
 		Content:   req.GetContent().AsMap(),
+		IsDraft:   req.GetIsDraft(),
 	}
 
 	storedArticle, err := h.uc.Create(ctx, a)
@@ -60,6 +61,7 @@ func (h *ArticlesHandler) Create(ctx context.Context, req *pb.CreateRequest, res
 	resp.Title = storedArticle.Title
 	resp.Thumbnail = storedArticle.Thumbnail
 	resp.Content = content
+	resp.IsDraft = storedArticle.IsDraft
 	resp.CreatedAt = timestamppb.New(storedArticle.CreatedAt)
 	resp.UpdatedAt = timestamppb.New(storedArticle.UpdatedAt)
 
@@ -85,14 +87,15 @@ func (h *ArticlesHandler) GetByCustomId(ctx context.Context, req *pb.ArticleCust
 	resp.Title = a.Title
 	resp.Thumbnail = a.Thumbnail
 	resp.Content = content
+	resp.IsDraft = a.IsDraft
 	resp.CreatedAt = timestamppb.New(a.CreatedAt)
 	resp.UpdatedAt = timestamppb.New(a.UpdatedAt)
 
 	return nil
 }
 
-func (h *ArticlesHandler) GetShortMany(ctx context.Context, req *pb.GetManyRequest, resp *pb.ShortArticlesResponse) error {
-	articles, err := h.uc.GetMany(ctx, req.GetOffset(), req.GetCount())
+func (h *ArticlesHandler) GetMany(ctx context.Context, req *pb.GetManyRequest, resp *pb.ShortArticlesResponse) error {
+	articles, err := h.uc.GetMany(ctx, req.GetOffset(), req.GetCount(), req.GetIsDrafts())
 	if err != nil {
 		h.l.Error("articles - GetByCustomId - h.uc.Create: %v", err)
 		return errors.BadRequest("no", "there are no articles in the specified range") // TODO: inner errors
@@ -100,13 +103,15 @@ func (h *ArticlesHandler) GetShortMany(ctx context.Context, req *pb.GetManyReque
 
 	for _, a := range articles {
 		resp.Articles = append(resp.Articles, &pb.ShortArticle{
-			Id:        a.Id,
-			CustomId:  a.CustomId,
-			AuthorId:  a.AuthorId,
-			Title:     a.Title,
-			Thumbnail: a.Thumbnail,
-			CreatedAt: timestamppb.New(a.CreatedAt),
-			UpdatedAt: timestamppb.New(a.UpdatedAt),
+			Id:           a.Id,
+			CustomId:     a.CustomId,
+			AuthorId:     a.AuthorId,
+			Title:        a.Title,
+			Thumbnail:    a.Thumbnail,
+			ShortContent: a.ShortContent,
+			IsDraft:      a.IsDraft,
+			CreatedAt:    timestamppb.New(a.CreatedAt),
+			UpdatedAt:    timestamppb.New(a.UpdatedAt),
 		})
 	}
 

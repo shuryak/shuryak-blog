@@ -9,6 +9,7 @@ type Article struct {
 	Title     string
 	Thumbnail string
 	Content   map[string]interface{}
+	IsDraft   bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
