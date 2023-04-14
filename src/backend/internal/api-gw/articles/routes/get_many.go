@@ -14,12 +14,13 @@ import (
 // @Description Get an articles by range
 // @Tags        Articles
 // @Produce     json
-// @Param   	offset query    int true "offset to get"
-// @Param   	count  query    int true "count to get"
-// @Success     200    {object} dto.ManyArticlesResponse
-// @Failure     400    {object} errors.Response
-// @Failure     500    {object} errors.Response
-// @Failure     502    {object} errors.Response
+// @Param   	offset    query    int  true "offset to get"
+// @Param   	count     query    int  true "count to get"
+// @Param   	is_drafts query    bool true "get drafts?"
+// @Success     200       {object} dto.ManyArticlesResponse
+// @Failure     400       {object} errors.Response
+// @Failure     500       {object} errors.Response
+// @Failure     502        {object} errors.Response
 // @Router      /articles/get_many [get]
 func (r *Routes) GetMany(ctx *gin.Context) {
 	var req dto.GetManyRequest

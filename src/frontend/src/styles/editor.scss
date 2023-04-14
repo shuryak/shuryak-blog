@@ -50,6 +50,10 @@
     flex-direction: column;
     width: 250px;
 
+    select {
+      cursor: pointer;
+    }
+
     label {
       font-size: 14px;
       font-weight: 500;

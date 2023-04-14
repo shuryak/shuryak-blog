@@ -1,4 +1,4 @@
-import {LoginRequest} from '../../models/token'
+import {LoginRequest} from '../../models/dto'
 
 // Login
 

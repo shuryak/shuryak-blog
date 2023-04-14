@@ -21,7 +21,6 @@ const api = axios.create({
 })
 // https://morioh.com/p/8e8b33c25ea1
 api.interceptors.response.use((response: AxiosResponse) => {
-  console.log('Cookie from:', response)
   if (response.data && response.headers['content-type'].indexOf('application/json') !== 1) {
     response.data = mapKeys(response.data, (value, key) => camelCase(key))
   }
@@ -71,7 +70,6 @@ export interface ResponseGenerator {
 function* fetchTokenSaga(payload: FetchLoginRequest) {
   try {
     const response: ResponseGenerator = yield call(getToken, payload.payload)
-    console.log(response)
     yield put(
       fetchLoginSuccess({
         accessToken: response.data.accessToken
@@ -91,7 +89,6 @@ function* fetchTokenSaga(payload: FetchLoginRequest) {
 function* fetchRefreshTokenSaga(payload: FetchRefreshRequest) {
   try {
     const response: ResponseGenerator = yield call(refreshToken, payload.payload)
-    console.log(response)
     yield put(
       fetchRefreshSuccess({
         accessToken: response.data.accessToken
