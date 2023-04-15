@@ -23,6 +23,10 @@ const App = () => {
     dispatch(fetchUsername({
       username: localStorage.getItem('username')
     }))
+
+    dispatch(fetchRefreshRequest({
+      username: localStorage.getItem('username')!
+    }))
   }
 
   const calledOnce = useRef(false);

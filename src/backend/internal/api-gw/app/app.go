@@ -88,6 +88,7 @@ func Run(cfg *config.Config) {
 		AllowOrigins:     []string{"http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.49.2:30050"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept-Encoding"},
 		ExposeHeaders:    []string{"Set-Cookie", "Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods"},
+		AllowMethods:     []string{"GET", "POST", "PATCH"},
 		AllowCredentials: true,
 	}))
 

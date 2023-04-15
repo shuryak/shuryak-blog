@@ -1,7 +1,7 @@
 import axios, {AxiosResponse, InternalAxiosRequestConfig} from 'axios'
 import {mapKeys, snakeCase} from 'lodash'
 import {camelCaseKeys} from './helpers'
-import {GetManyArticlesRequest, ShortArticlesResponse} from '../models/dto'
+import {CreateArticleRequest, GetManyArticlesRequest, Article, ShortArticle, ShortArticlesResponse, UpdateArticleRequest} from '../models/dto'
 
 const api = axios.create({
   baseURL: 'http://localhost:8080/',
@@ -35,5 +35,34 @@ export const getArticles = (payload: GetManyArticlesRequest) => api.get<ShortArt
   'articles/get_many',
   {
     params: payload
+  }
+)
+
+export const createArticle = (payload: CreateArticleRequest, accessToken: string) => api.post<ShortArticle>(
+  'articles/create',
+  payload,
+  {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  }
+)
+
+export const updateArticle = (payload: UpdateArticleRequest, accessToken: string) => api.patch<ShortArticle>(
+  'articles/update',
+  payload,
+  {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  }
+)
+
+export const getArticleByCustomId = (customId: string) => api.get<Article>(
+  'articles/get_by_custom_id',
+  {
+    params: {
+      customId: customId
+    }
   }
 )
