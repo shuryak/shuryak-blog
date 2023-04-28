@@ -14,12 +14,12 @@ import (
 )
 
 type AuthWrapper struct {
-	с client.Client
+	c client.Client
 	l logger.Interface
 }
 
-func NewAuthWrapper(с client.Client, l logger.Interface) *AuthWrapper {
-	return &AuthWrapper{с, l}
+func NewAuthWrapper(c client.Client, l logger.Interface) *AuthWrapper {
+	return &AuthWrapper{c, l}
 }
 
 var authEndpoints = map[string]struct{}{
@@ -51,7 +51,7 @@ func (w *AuthWrapper) Use(fn server.HandlerFunc) server.HandlerFunc {
 
 		token := strings.TrimSpace(authSplit[1])
 
-		uc := pb.NewUserService("user", w.с)
+		uc := pb.NewUserService("user", w.c)
 		outToken, err := uc.Validate(ctx, &pb.ValidateRequest{AccessToken: token})
 		if err != nil {
 			return errors.Unauthorized("token", "invalid token structure") // TODO: inner errors from user service
